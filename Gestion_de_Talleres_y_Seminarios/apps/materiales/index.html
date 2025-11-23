@@ -1,0 +1,10 @@
+<h1>Página de Materiales</h1>
+<p>Bienvenido a la página de materiales. Aquí encontrarás información sobre los materiales disponibles para los talleres.</p>
+<h1>Materiales</h1>
+<ul>
+  {% for material in materiales %}
+    <li>{{ material.nombre }}</li>
+  {% empty %}
+    <li>No hay materiales disponibles</li>
+  {% endfor %}
+</ul>
