@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Verificar certificado{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width:720px;margin:2rem auto;">
+   <h1 class="mb-3">Verificar certificado</h1>
+
+   <form method="post" class="mb-4">
+      {% csrf_token %}
+      <div class="form-group">
+         <label for="codigo">Código del certificado</label>
+         <input
+            id="codigo"
+            name="codigo"
+            type="text"
+            class="form-control"
+            placeholder="Ej. ABC123456"
+            value="{{ request.POST.codigo|default:codigo|default:'' }}"
+            required
+         >
+      </div>
+      <button type="submit" class="btn btn-primary">Verificar</button>
+   </form>
+
+   {% if error %}
+      <div class="alert alert-danger" role="alert">{{ error }}</div>
+   {% endif %}
+
+   {% if certificate %}
+      <div class="card">
+         <div class="card-body">
+            <h5 class="card-title">Certificado válido</h5>
+            <p class="mb-1"><strong>Nombre:</strong> {{ certificate.nombre }}</p>
+            <p class="mb-1"><strong>Curso:</strong> {{ certificate.curso }}</p>
+            <p class="mb-1"><strong>Fecha:</strong> {{ certificate.fecha }}</p>
+            <p class="mb-1"><strong>Código:</strong> {{ certificate.codigo }}</p>
+
+            {% if certificate.file_url %}
+               <a href="{{ certificate.file_url }}" class="btn btn-outline-secondary mt-2" target="_blank" rel="noopener">Ver/Descargar PDF</a>
+            {% endif %}
+         </div>
+      </div>
+   {% endif %}
+</div>
+{% endblock %}

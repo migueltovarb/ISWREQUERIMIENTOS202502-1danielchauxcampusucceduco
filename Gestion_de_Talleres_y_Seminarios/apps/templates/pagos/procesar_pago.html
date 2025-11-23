@@ -1,0 +1,614 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Procesar Pago - {{ inscripcion.taller.titulo }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .payment-wrapper {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+    
+    .payment-hero {
+        background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);
+        color: white;
+        border-radius: 20px 20px 0 0;
+        padding: 3rem 2rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .payment-hero::before {
+        content: '💳';
+        position: absolute;
+        font-size: 12rem;
+        opacity: 0.1;
+        top: -2rem;
+        right: -2rem;
+    }
+    
+    .payment-hero h1 {
+        font-size: 2rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .amount-display {
+        font-size: 4rem;
+        font-weight: 900;
+        line-height: 1;
+        margin: 1.5rem 0;
+        text-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        position: relative;
+        z-index: 1;
+    }
+    
+    .amount-display small {
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+    
+    .countdown-timer {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        display: inline-block;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .countdown-time {
+        font-size: 2rem;
+        font-weight: 700;
+        font-family: 'Courier New', monospace;
+        letter-spacing: 2px;
+    }
+    
+    .payment-container {
+        background: white;
+        border-radius: 0 0 20px 20px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    }
+    
+    .payment-section {
+        padding: 2rem;
+        border-bottom: 2px solid #F3F4F6;
+    }
+    
+    .payment-section:last-child {
+        border-bottom: none;
+    }
+    
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1F2937;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .section-title i {
+        color: #2563EB;
+        font-size: 1.5rem;
+    }
+    
+    .order-summary {
+        background: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
+        border-radius: 16px;
+        padding: 2rem;
+    }
+    
+    .order-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 1px solid #E5E7EB;
+    }
+    
+    .order-item:last-child {
+        border-bottom: none;
+        padding-top: 1.5rem;
+        margin-top: 1rem;
+        border-top: 2px solid #D1D5DB;
+    }
+    
+    .order-total {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #1E3A8A;
+    }
+    
+    .payment-methods {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+    
+    .payment-method {
+        background: white;
+        border: 3px solid #E5E7EB;
+        border-radius: 16px;
+        padding: 2rem 1.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+        position: relative;
+    }
+    
+    .payment-method:hover {
+        border-color: #2563EB;
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(37, 99, 235, 0.2);
+    }
+    
+    .payment-method.active {
+        border-color: #10B981;
+        background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+        box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+    }
+    
+    .payment-method input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+    }
+    
+    .payment-method-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        display: block;
+        transition: all 0.3s ease;
+    }
+    
+    .payment-method.active .payment-method-icon {
+        transform: scale(1.1);
+    }
+    
+    .payment-method-name {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: #1F2937;
+        margin-bottom: 0.5rem;
+    }
+    
+    .payment-method-description {
+        font-size: 0.875rem;
+        color: #6B7280;
+    }
+    
+    .payment-method .badge-popular {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        box-shadow: 0 4px 10px rgba(245, 158, 11, 0.4);
+    }
+    
+    .security-features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+    
+    .security-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: #F9FAFB;
+        border-radius: 12px;
+    }
+    
+    .security-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: #1E40AF;
+        flex-shrink: 0;
+    }
+    
+    .wompi-logos {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 2rem;
+        padding: 1.5rem;
+        background: #F9FAFB;
+        border-radius: 12px;
+        flex-wrap: wrap;
+    }
+    
+    .wompi-logo-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #6B7280;
+        font-size: 0.875rem;
+    }
+    
+    .btn-pay {
+        background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+        color: white;
+        padding: 1.25rem 3rem;
+        border-radius: 12px;
+        font-size: 1.25rem;
+        font-weight: 700;
+        border: none;
+        width: 100%;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+    }
+    
+    .btn-pay:hover:not(:disabled) {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(16, 185, 129, 0.4);
+    }
+    
+    .btn-pay:disabled {
+        background: #9CA3AF;
+        cursor: not-allowed;
+        box-shadow: none;
+    }
+    
+    .alert-warning {
+        background: #FEF3C7;
+        border-left: 4px solid #F59E0B;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        color: #92400E;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.6; }
+    }
+    
+    .pulse-animation {
+        animation: pulse 2s infinite;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="payment-wrapper animate__animated animate__fadeIn">
+    <!-- Hero de Pago -->
+    <div class="payment-hero">
+        <i class="fas fa-lock fa-2x mb-3"></i>
+        <h1>Pago Seguro</h1>
+        <p class="mb-0">{{ inscripcion.taller.titulo }}</p>
+        
+        <div class="amount-display">
+            ${{ inscripcion.taller.costo|floatformat:0 }}
+            <small>COP</small>
+        </div>
+
+    <div class="payment-container">
+        <!-- Resumen del Pedido -->
+        <div class="payment-section">
+            <div class="section-title">
+                <i class="fas fa-receipt"></i>
+                Resumen de tu Pedido
+            </div>
+            
+            <div class="order-summary">
+                <div class="order-item">
+                    <div>
+                        <strong class="d-block mb-1">{{ inscripcion.taller.titulo }}</strong>
+                        <div class="small text-muted">
+                            <i class="fas fa-user me-1"></i>
+                            {{ inscripcion.taller.instructor.get_full_name }}
+                        </div>
+                        <div class="small text-muted">
+                            <i class="fas fa-calendar me-1"></i>
+                            {{ inscripcion.taller.fecha_inicio|date:"d/m/Y" }}
+                            <i class="fas fa-clock ms-2 me-1"></i>
+                            {{ inscripcion.taller.duracion_horas }} horas
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <strong class="d-block">${{ inscripcion.taller.costo|floatformat:0 }}</strong>
+                    </div>
+                </div>
+                
+                <div class="order-item">
+                    <span>Subtotal</span>
+                    <span>${{ inscripcion.taller.costo|floatformat:0 }}</span>
+                </div>
+                
+                <div class="order-item">
+                    <span>IVA (0%)</span>
+                    <span>$0</span>
+                </div>
+                
+                <div class="order-item">
+                    <span class="order-total">Total a Pagar</span>
+                    <span class="order-total">${{ inscripcion.taller.costo|floatformat:0 }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Métodos de Pago -->
+        <div class="payment-section">
+            <div class="section-title">
+                <i class="fas fa-credit-card"></i>
+                Selecciona tu Método de Pago
+            </div>
+            
+            <form id="paymentForm" method="post">
+                {% csrf_token %}
+                
+                <div class="payment-methods">
+                    <!-- PSE -->
+                    <label class="payment-method" for="pse">
+                        <input type="radio" name="payment_method" value="PSE" id="pse" required>
+                        <span class="badge-popular">Popular</span>
+                        <div class="payment-method-icon">🏦</div>
+                        <div class="payment-method-name">PSE</div>
+                        <div class="payment-method-description">
+                            Pago desde tu banco
+                        </div>
+                    </label>
+                    
+                    <!-- Tarjeta -->
+                    <label class="payment-method" for="card">
+                        <input type="radio" name="payment_method" value="CARD" id="card">
+                        <div class="payment-method-icon">💳</div>
+                        <div class="payment-method-name">Tarjeta</div>
+                        <div class="payment-method-description">
+                            Crédito o débito
+                        </div>
+                    </label>
+                    
+                    <!-- Nequi -->
+                    <label class="payment-method" for="nequi">
+                        <input type="radio" name="payment_method" value="NEQUI" id="nequi">
+                        <div class="payment-method-icon">📱</div>
+                        <div class="payment-method-name">Nequi</div>
+                        <div class="payment-method-description">
+                            Pago con QR
+                        </div>
+                    </label>
+                    
+                    <!-- Bancolombia -->
+                    <label class="payment-method" for="bancolombia">
+                        <input type="radio" name="payment_method" value="BANCOLOMBIA_TRANSFER" id="bancolombia">
+                        <div class="payment-method-icon">🏧</div>
+                        <div class="payment-method-name">Bancolombia</div>
+                        <div class="payment-method-description">
+                            Transferencia QR
+                        </div>
+                    </label>
+                </div>
+                
+                <!-- Información del Pagador -->
+                <div class="alert-modern alert-info-modern mt-4">
+                    <i class="fas fa-user-circle"></i>
+                    <div>
+                        <strong>Información del Pagador</strong><br>
+                        <strong>Nombre:</strong> {{ user.get_full_name }}<br>
+                        <strong>Email:</strong> {{ user.email }}<br>
+                        <strong>Celular:</strong> {{ user.celular }}<br>
+                        <strong>Documento:</strong> {{ user.documento }}
+                    </div>
+                </div>
+                
+                <!-- Términos -->
+                <div class="form-check mt-3">
+                    <input class="form-check-input" type="checkbox" id="acceptTerms" required>
+                    <label class="form-check-label" for="acceptTerms">
+                        Acepto que el pago es <strong>no reembolsable</strong> excepto en caso de cancelación del taller por parte de la universidad. He leído y acepto los <a href="#" target="_blank">términos y condiciones</a>.
+                    </label>
+                </div>
+                
+                <!-- Botones -->
+                <div class="row g-3 mt-4">
+                    <div class="col-md-4">
+                        <a href="{% url 'detalle_taller' inscripcion.taller.id %}" class="btn btn-outline-secondary w-100 btn-modern">
+                            <i class="fas fa-arrow-left"></i>
+                            Cancelar
+                        </a>
+                    </div>
+                    <div class="col-md-8">
+                        <button type="submit" class="btn-pay" id="btnPay" disabled>
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Pagar con Wompi</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Seguridad -->
+        <div class="payment-section">
+            <div class="section-title">
+                <i class="fas fa-shield-alt"></i>
+                Tu Pago está Protegido
+            </div>
+            
+            <div class="security-features">
+                <div class="security-item">
+                    <div class="security-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div>
+                        <strong class="d-block mb-1">Encriptación SSL</strong>
+                        <small class="text-muted">Conexión 100% segura</small>
+                    </div>
+                </div>
+                
+                <div class="security-item">
+                    <div class="security-icon">
+                        <i class="fas fa-shield-check"></i>
+                    </div>
+                    <div>
+                        <strong class="d-block mb-1">PCI-DSS Certificado</strong>
+                        <small class="text-muted">Estándares internacionales</small>
+                    </div>
+                </div>
+                
+                <div class="security-item">
+                    <div class="security-icon">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <div>
+                        <strong class="d-block mb-1">Datos Protegidos</strong>
+                        <small class="text-muted">No almacenamos tu info bancaria</small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Logos de Wompi y Procesadores -->
+            <div class="wompi-logos mt-4">
+                <div class="wompi-logo-item">
+                    <i class="fas fa-check-circle text-success"></i>
+                    <strong>Wompi</strong>
+                </div>
+                <div class="wompi-logo-item">
+                    <i class="fas fa-university"></i>
+                    <span>PSE</span>
+                </div>
+                <div class="wompi-logo-item">
+                    <i class="fab fa-cc-visa"></i>
+                    <span>Visa</span>
+                </div>
+                <div class="wompi-logo-item">
+                    <i class="fab fa-cc-mastercard"></i>
+                    <span>Mastercard</span>
+                </div>
+                <div class="wompi-logo-item">
+                    <i class="fas fa-mobile-alt"></i>
+                    <span>Nequi</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ayuda -->
+        <div class="text-center py-3">
+            <small class="text-muted">
+                <i class="fas fa-headset"></i>
+                ¿Problemas con el pago? <a href="mailto:soporte@universidad.edu">Contáctanos</a>
+            </small>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Temporizador de 30 minutos
+    let timeLeft = 30 * 60; // 30 minutos en segundos
+    
+    function updateCountdown() {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        
+        document.getElementById('countdown').textContent = 
+            `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        
+        if (timeLeft <= 0) {
+            alert('⏰ El tiempo para completar el pago ha expirado. Tu inscripción ha sido cancelada.');
+            window.location.href = "{% url 'detalle_taller' inscripcion.taller.id %}";
+        } else if (timeLeft <= 60) {
+            // Último minuto - poner en rojo
+            document.getElementById('countdown').style.color = '#EF4444';
+        }
+        
+        timeLeft--;
+    }
+    
+    // Actualizar cada segundo
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+    
+    // Selección de método de pago
+    const paymentMethods = document.querySelectorAll('.payment-method');
+    const btnPay = document.getElementById('btnPay');
+    const acceptTerms = document.getElementById('acceptTerms');
+    
+    paymentMethods.forEach(method => {
+        method.addEventListener('click', function() {
+            paymentMethods.forEach(m => m.classList.remove('active'));
+            this.classList.add('active');
+            updatePayButton();
+        });
+    });
+    
+    acceptTerms.addEventListener('change', updatePayButton);
+    
+    function updatePayButton() {
+        const methodSelected = document.querySelector('input[name="payment_method"]:checked');
+        const termsAccepted = acceptTerms.checked;
+        
+        btnPay.disabled = !(methodSelected && termsAccepted);
+    }
+    
+    // Validación del formulario
+    document.getElementById('paymentForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const methodSelected = document.querySelector('input[name="payment_method"]:checked');
+        const termsAccepted = acceptTerms.checked;
+        
+        if (!methodSelected) {
+            alert('⚠️ Por favor selecciona un método de pago');
+            return;
+        }
+        
+        if (!termsAccepted) {
+            alert('⚠️ Debes aceptar los términos y condiciones');
+            return;
+        }
+        
+        if (!confirm('¿Confirmas que deseas proceder con el pago de ${{ inscripcion.taller.costo|floatformat:0 }}?')) {
+            return;
+        }
+        
+        // Mostrar loading
+        btnPay.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Procesando...</span>';
+        btnPay.disabled = true;
+        
+        // Enviar formulario
+        this.submit();
+    });
+    
+    // Prevenir salida accidental
+    window.addEventListener('beforeunload', function(e) {
+        if (timeLeft > 0) {
+            e.preventDefault();
+            e.returnValue = '¿Estás seguro de salir? Perderás tu reserva.';
+        }
+    });
+    
+    // Auto-seleccionar primer método
+    document.addEventListener('DOMContentLoaded', function() {
+        const firstMethod = document.getElementById('pse');
+        if (firstMethod) {
+            firstMethod.checked = true;
+            firstMethod.closest('.payment-method').classList.add('active');
+        }
+    });
+</script>

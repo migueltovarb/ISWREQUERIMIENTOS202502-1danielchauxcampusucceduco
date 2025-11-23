@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Iniciar sesión</title>
+</head>
+<body>
+
+<h2>Login</h2>
+
+{% for message in messages %}
+<p style="color:red;">{{ message }}</p>
+{% endfor %}
+
+<form method="POST">
+    {% csrf_token %}
+    <label>Usuario:</label>
+    <input type="text" name="username" required><br><br>
+
+    <label>Contraseña:</label>
+    <input type="password" name="password" required><br><br>
+
+    <button type="submit">Ingresar</button>
+</form>
+
+<p>¿No tienes cuenta? <a href="{% url 'register' %}">Regístrate</a></p>
+
+</body>
+</html>

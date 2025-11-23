@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Inscribirse al taller{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+   <h1 class="mb-3">Inscribirse{% if taller %}: {{ taller.nombre }}{% endif %}</h1>
+
+   {% if messages %}
+      <ul class="list-unstyled">
+         {% for message in messages %}
+            <li class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}" role="alert">
+               {{ message }}
+            </li>
+         {% endfor %}
+      </ul>
+   {% endif %}
+
+   {% if form %}
+      <form method="post" novalidate>
+         {% csrf_token %}
+         {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+               {{ form.non_field_errors }}
+            </div>
+         {% endif %}
+
+         {% for field in form %}
+            <div class="mb-3">
+               <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+               {{ field }}
+               {% if field.help_text %}
+                  <div class="form-text">{{ field.help_text }}</div>
+               {% endif %}
+               {% if field.errors %}
+                  <div class="text-danger small">
+                     {{ field.errors|striptags }}
+                  </div>
+               {% endif %}
+            </div>
+         {% endfor %}
+
+         <button type="submit" class="btn btn-primary">Inscribirme</button>
+         <button type="button" class="btn btn-secondary" onclick="history.back();">Cancelar</button>
+      </form>
+   {% else %}
+      <p>No hay formulario disponible.</p>
+   {% endif %}
+</div>
+{% endblock %}

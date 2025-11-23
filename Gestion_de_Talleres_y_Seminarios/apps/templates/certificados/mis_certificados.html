@@ -1,0 +1,500 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mis Certificados{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);
+        color: white;
+        border-radius: 16px;
+        padding: 3rem 2rem;
+        margin-bottom: 2rem;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(30, 58, 138, 0.3);
+    }
+    
+    .page-header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+    
+    .stats-overview {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-box {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+    }
+    
+    .stat-box:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    }
+    
+    .stat-box i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+    
+    .stat-box .number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-box.certificados {
+        background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+        color: white;
+    }
+    
+    .stat-box.en-progreso {
+        background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+        color: white;
+    }
+    
+    .stat-box.total {
+        background: linear-gradient(135deg, #2563EB 0%, #1E40AF 100%);
+        color: white;
+    }
+    
+    .certificado-card {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .certificado-card:hover {
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        transform: translateY(-3px);
+    }
+    
+    .certificado-header {
+        padding: 1.5rem;
+        background: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
+        border-bottom: 3px solid #E5E7EB;
+        display: flex;
+        justify-content: between;
+        align-items: center;
+    }
+    
+    .certificado-body {
+        padding: 1.5rem;
+    }
+    
+    .certificado-footer {
+        padding: 1rem 1.5rem;
+        background: #F9FAFB;
+        border-top: 1px solid #E5E7EB;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .status-badge.disponible {
+        background: #D1FAE5;
+        color: #065F46;
+    }
+    
+    .status-badge.pendiente {
+        background: #FEF3C7;
+        color: #92400E;
+    }
+    
+    .status-badge.no-califica {
+        background: #FEE2E2;
+        color: #991B1B;
+    }
+    
+    .status-badge.requiere-evaluacion {
+        background: #DBEAFE;
+        color: #1E40AF;
+    }
+    
+    .progress-circle {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: conic-gradient(
+            #10B981 0deg,
+            #10B981 calc(var(--progress) * 3.6deg),
+            #E5E7EB calc(var(--progress) * 3.6deg)
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+    
+    .progress-circle::before {
+        content: attr(data-progress) '%';
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1rem;
+        color: #1F2937;
+    }
+    
+    .taller-info {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+    
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: #6B7280;
+    }
+    
+    .info-item i {
+        width: 24px;
+        text-align: center;
+        color: #2563EB;
+    }
+    
+    .certificate-preview {
+        background: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
+        border: 3px dashed #D1D5DB;
+        border-radius: 12px;
+        padding: 3rem;
+        text-align: center;
+        margin: 1rem 0;
+    }
+    
+    .certificate-preview i {
+        font-size: 4rem;
+        color: #D1D5DB;
+        margin-bottom: 1rem;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+    
+    .empty-state i {
+        font-size: 5rem;
+        color: #E5E7EB;
+        margin-bottom: 1.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="page-header animate__animated animate__fadeInDown">
+    <i class="fas fa-certificate fa-3x mb-3"></i>
+    <h1>Mis Certificados</h1>
+    <p class="lead mb-0">Gestiona y descarga tus certificados de talleres completados</p>
+</div>
+
+<!-- Estadísticas -->
+<div class="stats-overview animate__animated animate__fadeInUp">
+    <div class="stat-box certificados">
+        <i class="fas fa-certificate"></i>
+        <div class="number">{{ certificados_obtenidos }}</div>
+        <div>Certificados Obtenidos</div>
+    </div>
+    
+    <div class="stat-box en-progreso">
+        <i class="fas fa-clock"></i>
+        <div class="number">{{ en_progreso }}</div>
+        <div>Talleres en Progreso</div>
+    </div>
+    
+    <div class="stat-box total">
+        <i class="fas fa-book-open"></i>
+        <div class="number">{{ total_talleres }}</div>
+        <div>Total de Talleres</div>
+    </div>
+</div>
+
+<!-- Lista de Certificados -->
+<div class="certificates-list">
+    {% if inscripciones_info %}
+        {% for info in inscripciones_info %}
+            <div class="certificado-card animate__animated animate__fadeInUp">
+                <!-- Header -->
+                <div class="certificado-header">
+                    <div class="flex-grow-1">
+                        <h4 class="mb-1">{{ info.inscripcion.taller.titulo }}</h4>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <span class="badge-modern badge-primary-modern">
+                                {{ info.inscripcion.taller.get_modalidad_display }}
+                            </span>
+                            <span class="status-badge {{ info.estado }}">
+                                {% if info.estado == 'disponible' %}
+                                    <i class="fas fa-check-circle"></i> Disponible
+                                {% elif info.estado == 'pendiente' %}
+                                    <i class="fas fa-clock"></i> En progreso
+                                {% elif info.estado == 'no_califica' %}
+                                    <i class="fas fa-times-circle"></i> No califica
+                                {% elif info.estado == 'requiere_evaluacion' %}
+                                    <i class="fas fa-star"></i> Requiere evaluación
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- Progreso de Asistencia -->
+                    <div class="progress-circle" style="--progress: {{ info.porcentaje_asistencia }}" data-progress="{{ info.porcentaje_asistencia|floatformat:0 }}">
+                    </div>
+                </div>
+                
+                <!-- Body -->
+                <div class="certificado-body">
+                    <!-- Información del Taller -->
+                    <div class="taller-info">
+                        <div class="info-item">
+                            <i class="fas fa-user-tie"></i>
+                            <span>{{ info.inscripcion.taller.instructor.get_full_name }}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-calendar"></i>
+                            <span>{{ info.inscripcion.taller.fecha_inicio|date:"d/m/Y" }}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-clock"></i>
+                            <span>{{ info.inscripcion.taller.duracion_horas }} horas</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-chart-line"></i>
+                            <span>{{ info.porcentaje_asistencia }}% de asistencia</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Mensaje de Estado -->
+                    <div class="alert-modern alert-{{ info.estado|yesno:'success,warning,error' }}-modern mt-3">
+                        <i class="fas fa-info-circle"></i>
+                        <div>
+                            <strong>Estado:</strong> {{ info.mensaje }}
+                        </div>
+                    </div>
+                    
+                    <!-- Vista Previa del Certificado -->
+                    {% if info.certificado %}
+                        <div class="certificate-preview">
+                            <i class="fas fa-file-certificate"></i>
+                            <h5>Certificado Generado</h5>
+                            <p class="text-muted mb-0">
+                                <i class="fas fa-calendar-check"></i>
+                                Emitido el {{ info.certificado.fecha_emision|date:"d/m/Y" }}
+                            </p>
+                            <p class="text-muted mb-0">
+                                <i class="fas fa-qrcode"></i>
+                                Código: <strong>{{ info.certificado.codigo }}</strong>
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Footer con Acciones -->
+                <div class="certificado-footer">
+                    <div>
+                        {% if info.certificado %}
+                            <small class="text-muted">
+                                <i class="fas fa-download"></i>
+                                {{ info.certificado.descargas|default:0 }} descarga{{ info.certificado.descargas|pluralize }}
+                            </small>
+                        {% else %}
+                            <small class="text-muted">Certificado no disponible</small>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <!-- Ver Asistencia -->
+                        <a href="{% url 'ver_asistencia' info.inscripcion.id %}" class="btn btn-outline-primary btn-sm btn-modern">
+                            <i class="fas fa-clipboard-list"></i>
+                            Ver Asistencia
+                        </a>
+                        
+                        <!-- Evaluar Taller -->
+                        {% if info.estado == 'requiere_evaluacion' %}
+                            <a href="{% url 'evaluar_taller' info.inscripcion.id %}" class="btn-modern btn-warning-modern btn-sm">
+                                <i class="fas fa-star"></i>
+                                Evaluar Taller
+                            </a>
+                        {% endif %}
+                        
+                        <!-- Descargar Certificado -->
+                        {% if info.estado == 'disponible' %}
+                            <a href="{% url 'descargar_certificado' info.inscripcion.id %}" class="btn-modern btn-success-modern btn-sm" target="_blank">
+                                <i class="fas fa-download"></i>
+                                Descargar Certificado
+                            </a>
+                        {% elif info.estado == 'generar' %}
+                            <a href="{% url 'descargar_certificado' info.inscripcion.id %}" class="btn-modern btn-primary-modern btn-sm">
+                                <i class="fas fa-certificate"></i>
+                                Generar Certificado
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <!-- Estado Vacío -->
+        <div class="empty-state animate__animated animate__fadeIn">
+            <i class="fas fa-certificate"></i>
+            <h3>No tienes certificados aún</h3>
+            <p class="text-muted mb-4">
+                Inscríbete en talleres y completa al menos el 80% de asistencia para obtener tu certificado
+            </p>
+            <a href="{% url 'catalogo_talleres' %}" class="btn-modern btn-primary-modern">
+                <i class="fas fa-search"></i>
+                Explorar Talleres Disponibles
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Información de Ayuda -->
+{% if inscripciones_info %}
+<div class="card-modern mt-4 animate__animated animate__fadeInUp">
+    <div class="card-body-modern">
+        <h5 class="mb-3">
+            <i class="fas fa-question-circle text-primary"></i>
+            ¿Cómo obtener tu certificado?
+        </h5>
+        <div class="row g-3">
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="mb-2">
+                        <i class="fas fa-calendar-check fa-2x text-primary"></i>
+                    </div>
+                    <strong>1. Asiste</strong>
+                    <p class="text-muted small mb-0">
+                        Cumple con el 80% de asistencia mínimo
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="mb-2">
+                        <i class="fas fa-tasks fa-2x text-success"></i>
+                    </div>
+                    <strong>2. Finaliza</strong>
+                    <p class="text-muted small mb-0">
+                        Espera a que el taller finalice
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="mb-2">
+                        <i class="fas fa-star fa-2x text-warning"></i>
+                    </div>
+                    <strong>3. Evalúa</strong>
+                    <p class="text-muted small mb-0">
+                        Completa la evaluación del taller
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="mb-2">
+                        <i class="fas fa-download fa-2x text-info"></i>
+                    </div>
+                    <strong>4. Descarga</strong>
+                    <p class="text-muted small mb-0">
+                        Tu certificado estará disponible
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Verificación de Certificados -->
+<div class="text-center mt-4">
+    <p class="text-muted">
+        <i class="fas fa-shield-alt"></i>
+        ¿Necesitas verificar un certificado?
+        <a href="{% url 'verificar_certificado' %}" class="text-primary">
+            Haz clic aquí
+        </a>
+    </p>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Animación de los círculos de progreso
+    document.addEventListener('DOMContentLoaded', function() {
+        const circles = document.querySelectorAll('.progress-circle');
+        
+        circles.forEach(circle => {
+            const progress = circle.dataset.progress;
+            circle.style.setProperty('--progress', progress);
+            
+            // Color basado en el porcentaje
+            if (progress >= 80) {
+                circle.style.background = `conic-gradient(
+                    #10B981 0deg,
+                    #10B981 calc(${progress} * 3.6deg),
+                    #E5E7EB calc(${progress} * 3.6deg)
+                )`;
+            } else if (progress >= 60) {
+                circle.style.background = `conic-gradient(
+                    #F59E0B 0deg,
+                    #F59E0B calc(${progress} * 3.6deg),
+                    #E5E7EB calc(${progress} * 3.6deg)
+                )`;
+            } else {
+                circle.style.background = `conic-gradient(
+                    #EF4444 0deg,
+                    #EF4444 calc(${progress} * 3.6deg),
+                    #E5E7EB calc(${progress} * 3.6deg)
+                )`;
+            }
+        });
+    });
+    
+    // Confirmación antes de descargar
+    const downloadButtons = document.querySelectorAll('a[href*="descargar_certificado"]');
+    downloadButtons.forEach(btn => {
+        if (btn.textContent.includes('Generar')) {
+            btn.addEventListener('click', function(e) {
+                if (!confirm('Se generará tu certificado. ¿Deseas continuar?')) {
+                    e.preventDefault();
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

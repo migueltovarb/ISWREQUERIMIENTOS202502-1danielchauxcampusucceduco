@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Evaluar Taller</title>
+   <style>
+      body {
+         font-family: Arial, sans-serif;
+         margin: 20px;
+      }
+      .rating {
+         display: flex;
+         justify-content: space-between;
+         margin-bottom: 15px;
+      }
+   </style>
+</head>
+<body>
+   <h1>Evaluación del Taller</h1>
+   <form id="evaluationForm">
+      <div class="rating">
+         <label for="contenido">Contenido (⭐⭐⭐⭐⭐) *:</label>
+         <input type="number" id="contenido" name="contenido" min="1" max="5" required>
+      </div>
+      <div class="rating">
+         <label for="metodologia">Metodología (⭐⭐⭐⭐⭐) *:</label>
+         <input type="number" id="metodologia" name="metodologia" min="1" max="5" required>
+      </div>
+      <div class="rating">
+         <label for="dominio">Dominio del ponente (⭐⭐⭐⭐⭐) *:</label>
+         <input type="number" id="dominio" name="dominio" min="1" max="5" required>
+      </div>
+      <div class="rating">
+         <label for="pertinencia">Pertinencia (⭐⭐⭐⭐⭐) *:</label>
+         <input type="number" id="pertinencia" name="pertinencia" min="1" max="5" required>
+      </div>
+      <div class="rating">
+         <label for="satisfaccion">Satisfacción general (⭐⭐⭐⭐⭐) *:</label>
+         <input type="number" id="satisfaccion" name="satisfaccion" min="1" max="5" required>
+      </div>
+      <div class="rating">
+         <label for="opinion">Opinión del taller (1-1000 caracteres):</label>
+         <textarea id="opinion" name="opinion" maxlength="1000></textarea>
+      </div>
+      <button type="button" onclick="guardarEvaluacion()">Guardar Evaluación</button>
+   </form>
+   <div id="resultado"></div>
+
+   <script>
+      function guardarEvaluacion() {
+         const contenido = parseInt(document.getElementById('contenido').value);
+         const metodologia = parseInt(document.getElementById('metodologia').value);
+         const dominio = parseInt(document.getElementById('dominio').value);
+         const pertinencia = parseInt(document.getElementById('pertinencia').value);
+         const satisfaccion = parseInt(document.getElementById('satisfaccion').value);
+
+         const promedio = (contenido + metodologia + dominio + pertinencia + satisfaccion) / 5;
+         document.getElementById('resultado').innerText = `Calificación promedio: ${promedio.toFixed(2)} ⭐⭐⭐⭐⭐`;
+      }
+   </script>
+</body>
+</html>

@@ -1,0 +1,615 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ taller.titulo }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .taller-hero {
+        background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);
+        color: white;
+        border-radius: 20px;
+        padding: 3rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 20px 40px rgba(30, 58, 138, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .taller-hero::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        border-radius: 50%;
+    }
+    
+    .taller-hero h1 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .taller-badges {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.5rem;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .badge-hero {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        padding: 0.75rem 1.5rem;
+        border-radius: 25px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .precio-hero {
+        background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+        padding: 1.5rem 2rem;
+        border-radius: 16px;
+        text-align: center;
+        position: relative;
+        z-index: 1;
+        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+    }
+    
+    .precio-hero.gratis {
+        background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+    }
+    
+    .precio-hero .amount {
+        font-size: 3rem;
+        font-weight: 800;
+        line-height: 1;
+        margin-bottom: 0.5rem;
+    }
+    
+    .cupos-bar {
+        width: 100%;
+        height: 12px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        overflow: hidden;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .cupos-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #10B981 0%, #34D399 100%);
+        border-radius: 10px;
+        transition: width 0.5s ease;
+    }
+    
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .info-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .info-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    }
+    
+    .info-card .icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        flex-shrink: 0;
+    }
+    
+    .info-card .icon.blue {
+        background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%);
+        color: #1E40AF;
+    }
+    
+    .info-card .icon.green {
+        background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+        color: #065F46;
+    }
+    
+    .info-card .icon.orange {
+        background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+        color: #92400E;
+    }
+    
+    .info-card .icon.purple {
+        background: linear-gradient(135deg, #E9D5FF 0%, #D8B4FE 100%);
+        color: #6B21A8;
+    }
+    
+    .instructor-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        display: flex;
+        gap: 2rem;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+    
+    .instructor-avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #2563EB 0%, #1E40AF 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        color: white;
+        font-weight: 700;
+        flex-shrink: 0;
+        box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+    }
+    
+    .rating-stars {
+        color: #F59E0B;
+        font-size: 1.25rem;
+    }
+    
+    .sesiones-timeline {
+        position: relative;
+        padding-left: 2rem;
+    }
+    
+    .sesiones-timeline::before {
+        content: '';
+        position: absolute;
+        left: 8px;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: linear-gradient(180deg, #2563EB 0%, #10B981 100%);
+    }
+    
+    .sesion-item {
+        position: relative;
+        padding: 1.5rem;
+        background: white;
+        border-radius: 12px;
+        margin-bottom: 1rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+    }
+    
+    .sesion-item:hover {
+        box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        transform: translateX(5px);
+    }
+    
+    .sesion-item::before {
+        content: '';
+        position: absolute;
+        left: -1.85rem;
+        top: 1.5rem;
+        width: 20px;
+        height: 20px;
+        background: #2563EB;
+        border: 4px solid white;
+        border-radius: 50%;
+        box-shadow: 0 0 0 2px #2563EB;
+    }
+    
+    .btn-inscribirse {
+        background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+        color: white;
+        padding: 1rem 3rem;
+        border-radius: 12px;
+        font-size: 1.25rem;
+        font-weight: 700;
+        border: none;
+        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+    
+    .btn-inscribirse:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(16, 185, 129, 0.4);
+        color: white;
+    }
+    
+    .btn-inscribirse:disabled {
+        background: #9CA3AF;
+        cursor: not-allowed;
+        box-shadow: none;
+    }
+    
+    .evaluacion-summary {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+    
+    .rating-overview {
+        text-align: center;
+        padding: 2rem;
+        background: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
+        border-radius: 12px;
+        margin-bottom: 2rem;
+    }
+    
+    .rating-number {
+        font-size: 4rem;
+        font-weight: 800;
+        color: #1E3A8A;
+        line-height: 1;
+    }
+    
+    .rating-bars {
+        margin-top: 1.5rem;
+    }
+    
+    .rating-bar-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .rating-bar {
+        flex: 1;
+        height: 8px;
+        background: #E5E7EB;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    
+    .rating-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #F59E0B 0%, #FCD34D 100%);
+        border-radius: 10px;
+        transition: width 0.5s ease;
+    }
+    
+    .sticky-sidebar {
+        position: sticky;
+        top: 100px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Contenido Principal -->
+    <div class="col-lg-8">
+        <!-- Hero del Taller -->
+        <div class="taller-hero animate__animated animate__fadeInDown">
+            <div class="taller-badges">
+                <span class="badge-hero">
+                    <i class="fas fa-{{ taller.modalidad|yesno:'video,map-marker-alt,globe' }}"></i>
+                    {{ taller.get_modalidad_display }}
+                </span>
+                <span class="badge-hero">
+                    <i class="fas fa-tag"></i>
+                    {{ taller.publico_objetivo }}
+                </span>
+                {% if taller.estado == 'confirmado' %}
+                <span class="badge-hero">
+                    <i class="fas fa-check-circle"></i>
+                    Confirmado
+                </span>
+                {% endif %}
+            </div>
+            
+            <h1>{{ taller.titulo }}</h1>
+            <p class="lead mb-4">{{ taller.descripcion }}</p>
+            
+            <!-- Barra de Cupos -->
+            <div class="mb-2">
+                <div class="d-flex justify-content-between mb-1">
+                    <small class="opacity-75">Cupos ocupados</small>
+                    <small class="opacity-75">{{ inscritos }}/{{ taller.capacidad_maxima }}</small>
+                </div>
+                <div class="cupos-bar">
+                    <div class="cupos-fill" style="width: 0%;" data-porcentaje="{{ porcentaje_ocupacion|default:0 }}"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grid de Información -->
+        <div class="info-grid animate__animated animate__fadeInUp">
+            <div class="info-card">
+                <div class="icon blue">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div>
+                    <small class="text-muted d-block">Fecha de Inicio</small>
+                    <strong>{{ taller.fecha_inicio|date:"d/m/Y" }}</strong>
+                </div>
+            </div>
+            
+            <div class="info-card">
+                <div class="icon green">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div>
+                    <small class="text-muted d-block">Duración</small>
+                    <strong>{{ taller.duracion_horas }} horas</strong>
+                </div>
+            </div>
+            
+            <div class="info-card">
+                <div class="icon orange">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div>
+                    <small class="text-muted d-block">Cupos Disponibles</small>
+                    <strong>{{ cupos_disponibles }}</strong>
+                </div>
+            </div>
+            
+            <div class="info-card">
+                <div class="icon purple">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div>
+                    <small class="text-muted d-block">Calificación</small>
+                    <strong>{{ promedios.promedio_total|default:"N/A" }}/5.0</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sobre el Taller -->
+        <div class="card-modern mb-4 animate__animated animate__fadeInUp">
+            <div class="card-header-modern">
+                <i class="fas fa-info-circle"></i> Sobre este Taller
+            </div>
+            <div class="card-body-modern">
+                <h5 class="mb-3">Descripción Completa</h5>
+                <p class="text-muted">{{ taller.descripcion }}</p>
+                
+                {% if taller.objetivos %}
+                <h5 class="mb-3 mt-4">Objetivos</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Objetivo 1</li>
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Objetivo 2</li>
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Objetivo 3</li>
+                </ul>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Instructor -->
+        <div class="instructor-card animate__animated animate__fadeInUp">
+            <div class="instructor-avatar">
+                {% if taller.instructor.instructor.foto %}
+                    <img src="{{ taller.instructor.instructor.foto.url }}" alt="{{ taller.instructor.get_full_name }}">
+                {% else %}
+                    {{ taller.instructor.first_name.0 }}{{ taller.instructor.last_name.0 }}
+                {% endif %}
+            </div>
+            <div class="flex-grow-1">
+                <h5 class="mb-1">{{ taller.instructor.get_full_name }}</h5>
+                <p class="text-muted mb-2">Instructor del Taller</p>
+                {% if promedios.total_evaluaciones > 0 %}
+                <div class="rating-stars mb-2">
+                    {% for i in "12345" %}
+                        {% if forloop.counter <= promedios.promedio_total %}
+                            <i class="fas fa-star"></i>
+                        {% else %}
+                            <i class="far fa-star"></i>
+                        {% endif %}
+                    {% endfor %}
+                    <small class="text-muted ms-2">{{ promedios.total_evaluaciones }} evaluaciones</small>
+                </div>
+                {% endif %}
+                {% if taller.instructor.instructor.experiencia %}
+                <p class="mb-0 small">{{ taller.instructor.instructor.experiencia|truncatewords:20 }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Sesiones -->
+        <div class="card-modern mb-4 animate__animated animate__fadeInUp">
+            <div class="card-header-modern">
+                <i class="fas fa-list-ol"></i> Programa por Sesiones
+            </div>
+            <div class="card-body-modern">
+                <div class="sesiones-timeline">
+                    {% for sesion in sesiones %}
+                    <div class="sesion-item">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="mb-0">Sesión {{ sesion.numero }} - {{ sesion.tema }}</h6>
+                            <span class="badge-modern badge-primary-modern">
+                                {{ sesion.duracion_minutos }} min
+                            </span>
+                        </div>
+                        <div class="text-muted small">
+                            <i class="fas fa-calendar me-1"></i>
+                            {{ sesion.fecha|date:"d/m/Y" }}
+                            <i class="fas fa-clock ms-3 me-1"></i>
+                            {{ sesion.fecha|date:"H:i" }}
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-calendar-times fa-2x mb-2"></i>
+                        <p>Las sesiones se publicarán próximamente</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Evaluaciones -->
+        {% if promedios.total_evaluaciones > 0 %}
+        <div class="evaluacion-summary animate__animated animate__fadeInUp">
+            <h4 class="mb-4">
+                <i class="fas fa-star text-warning"></i>
+                Evaluaciones y Opiniones
+            </h4>
+            
+            <div class="rating-overview">
+                <div class="rating-number">{{ promedios.promedio_total|floatformat:1 }}</div>
+                <div class="rating-stars">
+                    {% for i in "12345" %}
+                        {% if forloop.counter <= promedios.promedio_total %}
+                            <i class="fas fa-star"></i>
+                        {% else %}
+                            <i class="far fa-star"></i>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <p class="text-muted mb-0 mt-2">{{ promedios.total_evaluaciones }} evaluaciones</p>
+            </div>
+
+    <!-- Sidebar de Inscripción -->
+    <div class="col-lg-4">
+        <div class="sticky-sidebar">
+            <!-- Card de Precio e Inscripción -->
+            <div class="card-modern animate__animated animate__fadeInRight">
+                <div class="precio-hero {% if taller.costo == 0 %}gratis{% endif %}">
+                    {% if taller.costo > 0 %}
+                        <div class="amount">${{ taller.costo|floatformat:0 }}</div>
+                        <small>Inversión</small>
+                    {% else %}
+                        <div class="amount">GRATIS</div>
+                        <small>Sin costo</small>
+                    {% endif %}
+                </div>
+                
+                <div class="card-body-modern">
+                    {% if user.is_authenticated %}
+                        {% if ya_inscrito %}
+                            <div class="alert-modern alert-success-modern mb-3">
+                                <i class="fas fa-check-circle"></i>
+                                <div>
+                                    <strong>¡Ya estás inscrito!</strong><br>
+                                    Te enviamos la información por email
+                                </div>
+                            </div>
+                            <a href="{% url 'detalle_inscripcion' inscripcion.id %}" class="btn-modern btn-primary-modern w-100 mb-2">
+                                <i class="fas fa-eye"></i>
+                                Ver Mi Inscripción
+                            </a>
+                            <a href="{% url 'materiales_taller' taller.id %}" class="btn btn-outline-primary w-100 btn-modern">
+                                <i class="fas fa-folder-open"></i>
+                                Ver Materiales
+                            </a>
+                        {% else %}
+                            <button 
+                                class="btn-inscribirse" 
+                                {% if cupos_disponibles == 0 %}disabled{% endif %}>
+                                {% if cupos_disponibles > 0 %}
+                                    <i class="fas fa-check-circle"></i>
+                                    Inscribirme Ahora
+                                {% else %}
+                                    <i class="fas fa-times-circle"></i>
+                                    Cupos Agotados
+                                {% endif %}
+                            </button>
+                            
+                            {% if cupos_disponibles == 0 %}
+                            <a href="{% url 'unirse_lista_espera' taller.id %}" class="btn btn-outline-warning w-100 btn-modern mt-2">
+                                <i class="fas fa-clock"></i>
+                                Unirme a Lista de Espera
+                            </a>
+                            {% endif %}
+                        {% endif %}
+                    {% else %}
+                        <a href="{% url 'login' %}?next={% url 'detalle_taller' taller.id %}" class="btn-inscribirse">
+                            <i class="fas fa-sign-in-alt"></i>
+                            Iniciar Sesión para Inscribirme
+                        </a>
+                    {% endif %}
+                    
+                    <!-- Características -->
+                    <div class="mt-4">
+                        <h6 class="mb-3"><i class="fas fa-check-circle text-success"></i> Incluye:</h6>
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <i class="fas fa-certificate text-primary me-2"></i>
+                                Certificado digital
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-file-pdf text-danger me-2"></i>
+                                Materiales descargables
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-bell text-warning me-2"></i>
+                                Recordatorios automáticos
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-headset text-info me-2"></i>
+                                Soporte del instructor
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Compartir -->
+            <div class="card-modern mt-3 animate__animated animate__fadeInRight" style="animation-delay: 0.2s;">
+                <div class="card-body-modern text-center">
+                    <h6 class="mb-3">
+                        <i class="fas fa-share-alt"></i> Compartir Taller
+                    </h6>
+                    <div class="d-flex justify-content-center gap-2">
+                        <a href="#" class="btn btn-outline-primary btn-sm btn-modern">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="btn btn-outline-info btn-sm btn-modern">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="btn btn-outline-success btn-sm btn-modern">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                        <a href="#" class="btn btn-outline-secondary btn-sm btn-modern">
+                            <i class="fas fa-link"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Animación de la barra de cupos
+    document.addEventListener('DOMContentLoaded', function() {
+        const cuposBar = document.querySelector('.cupos-fill');
+        if (cuposBar) {
+            setTimeout(() => {
+                const pct = cuposBar.dataset.porcentaje || '0';
+                cuposBar.style.width = pct + '%';
+            }, 500);
+        }
+    });
+</script>
+{% endblock %}

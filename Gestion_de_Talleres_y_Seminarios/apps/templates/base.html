@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sistema de Gestión de Talleres y Seminarios - Universidad">
+    <title>Sistema de Talleres y Seminarios</title>
+    
+    <!-- Fuentes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5.3 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <!-- Estilos Personalizados -->
+    <style>
+        /* ===================================
+           VARIABLES Y CONFIGURACIÓN BASE
+        =================================== */
+        :root {
+            /* Colores Principales */
+            --color-primario: #1E3A8A;
+            --color-primario-claro: #2563EB;
+            --color-primario-oscuro: #1E40AF;
+            
+            /* Colores Secundarios */
+            --color-secundario: #10B981;
+            --color-secundario-claro: #34D399;
+            --color-secundario-oscuro: #059669;
+            
+            /* Colores de Acento */
+            --color-naranja: #F59E0B;
+            --color-amarillo: #FCD34D;
+            --color-rojo: #EF4444;
+            
+            /* Escala de Grises */
+            --gris-50: #F9FAFB;
+            --gris-100: #F3F4F6;
+            --gris-200: #E5E7EB;
+            --gris-300: #D1D5DB;
+            --gris-500: #6B7280;
+            --gris-700: #374151;
+            --gris-800: #1F2937;
+            --gris-900: #111827;
+            
+            /* Tipografía */
+            --fuente-principal: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            
+            /* Sombras */
+            --sombra-pequena: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --sombra-mediana: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --sombra-grande: 0 10px 25px rgba(0, 0, 0, 0.15);
+            
+            /* Transiciones */
+            --transicion-rapida: 0.2s ease;
+            --transicion-normal: 0.3s ease;
+        }
+        
+        /* Reset Básico */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--fuente-principal);
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--gris-800);
+            background-color: var(--gris-50);
+        }
+        
+        /* ===================================
+           BARRA DE NAVEGACIÓN
+        =================================== */
+        .navbar-personalizada {
+            background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-primario-claro) 100%);
+            box-shadow: var(--sombra-mediana);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .logo-marca {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: white !important;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: var(--transicion-normal);
+        }
+        
+        .logo-marca:hover {
+            transform: scale(1.05);
+            opacity: 0.9;
+        }
+        
+        .logo-marca i {
+            font-size: 1.75rem;
+            color: var(--color-amarillo);
+        }
+        
+        .enlace-nav {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-weight: 500;
+            padding: 0.6rem 1.2rem !important;
+            border-radius: 8px;
+            transition: var(--transicion-rapida);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .enlace-nav:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: white !important;
+            transform: translateY(-2px);
+        }
+        
+        .enlace-nav.activo {
+            background-color: rgba(255, 255, 255, 0.25);
+            color: white !important;
+        }
+        
+        /* Badge de Notificación */
+        .badge-notificacion {
+            background-color: var(--color-rojo);
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            margin-left: 0.25rem;
+        }
+        
+        /* Menú Desplegable */
+        .menu-desplegable {
+            border: none;
+            box-shadow: var(--sombra-grande);
+            border-radius: 12px;
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .item-desplegable {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            transition: var(--transicion-rapida);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--gris-700);
+            text-decoration: none;
+        }
+        
+        .item-desplegable:hover {
+            background-color: var(--gris-100);
+            color: var(--color-primario);
+            transform: translateX(5px);
+        }
+        
+        .item-desplegable i {
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* ===================================
+           BOTONES
+        =================================== */
+        .boton {
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            transition: var(--transicion-normal);
+            border: none;
+            box-shadow: var(--sombra-pequena);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        .boton:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--sombra-mediana);
+        }
+        
+        .boton-primario {
+            background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-primario-claro) 100%);
+            color: white;
+        }
+        
+        .boton-primario:hover {
+            background: linear-gradient(135deg, var(--color-primario-oscuro) 0%, var(--color-primario) 100%);
+            color: white;
+        }
+        
+        .boton-exito {
+            background: linear-gradient(135deg, var(--color-secundario-oscuro) 0%, var(--color-secundario) 100%);
+            color: white;
+        }
+        
+        .boton-exito:hover {
+            background: linear-gradient(135deg, var(--color-secundario) 0%, var(--color-secundario-claro) 100%);
+            color: white;
+        }
+        
+        .boton-contorno {
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+        }
+        
+        .boton-contorno:hover {
+            background: white;
+            color: var(--color-primario);
+        }
+        
+        /* ===================================
+           TARJETAS
+        =================================== */
+        .tarjeta {
+            border: none;
+            border-radius: 16px;
+            box-shadow: var(--sombra-mediana);
+            transition: var(--transicion-normal);
+            overflow: hidden;
+            background: white;
+            margin-bottom: 1.5rem;
+        }
+        
+        .tarjeta:hover {
+            box-shadow: var(--sombra-grande);
+            transform: translateY(-5px);
+        }
+        
+        .tarjeta-encabezado {
+            background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-primario-claro) 100%);
+            color: white;
+            padding: 1.25rem 1.5rem;
+            border: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .tarjeta-cuerpo {
+            padding: 1.5rem;
+        }
+        
+        /* ===================================
+           ALERTAS Y MENSAJES
+        =================================== */
+        .alerta {
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            box-shadow: var(--sombra-pequena);
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .alerta i {
+            font-size: 1.5rem;
+            margin-top: 0.1rem;
+        }
+        
+        .alerta-exito {
+            background-color: #D1FAE5;
+            color: var(--color-secundario-oscuro);
+            border-left: 4px solid var(--color-secundario);
+        }
+        
+        .alerta-error {
+            background-color: #FEE2E2;
+            color: #991B1B;
+            border-left: 4px solid var(--color-rojo);
+        }
+        
+        .alerta-advertencia {
+            background-color: #FEF3C7;
+            color: #92400E;
+            border-left: 4px solid var(--color-naranja);
+        }
+        
+        .alerta-info {
+            background-color: #DBEAFE;
+            color: var(--color-primario-oscuro);
+            border-left: 4px solid var(--color-primario-claro);
+        }
+        
+        /* ===================================
+           PIE DE PÁGINA
+        =================================== */
+        .pie-pagina {
+            background: linear-gradient(135deg, var(--gris-800) 0%, var(--gris-900) 100%);
+            color: var(--gris-300);
+            padding: 3rem 0 1.5rem;
+            margin-top: 4rem;
+        }
+        
+        .pie-pagina h5 {
+            color: white;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+        
+        .pie-pagina a {
+            color: var(--gris-300);
+            text-decoration: none;
+            transition: var(--transicion-rapida);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .pie-pagina a:hover {
+            color: white;
+            padding-left: 5px;
+        }
+        
+        .redes-sociales {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .redes-sociales a {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transicion-rapida);
+            margin-bottom: 0;
+            padding: 0;
+        }
+        
+        .redes-sociales a:hover {
+            background-color: var(--color-primario-claro);
+            transform: translateY(-3px);
+        }
+        
+        /* ===================================
+           CONTENEDOR PRINCIPAL
+        =================================== */
+        .contenedor-principal {
+            min-height: calc(100vh - 250px);
+            padding: 2rem 0;
+        }
+        
+        /* ===================================
+           BADGES Y ETIQUETAS
+        =================================== */
+        .etiqueta {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            display: inline-block;
+        }
+        
+        .etiqueta-primaria {
+            background-color: #DBEAFE;
+            color: var(--color-primario);
+        }
+        
+        .etiqueta-exito {
+            background-color: #D1FAE5;
+            color: var(--color-secundario-oscuro);
+        }
+        
+        .etiqueta-advertencia {
+            background-color: #FEF3C7;
+            color: #92400E;
+        }
+        
+        /* ===================================
+           UTILIDADES Y RESPONSIVE
+        =================================== */
+        
+        /* Barra de desplazamiento personalizada */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--gris-100);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--color-primario-claro);
+            border-radius: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--color-primario);
+        }
+        
+        /* Loader / Cargador */
+        .cargador {
+            border: 4px solid var(--gris-200);
+            border-top: 4px solid var(--color-primario);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: girar 1s linear infinite;
+            margin: 2rem auto;
+        }
+        
+        @keyframes girar {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive - Dispositivos móviles */
+        @media (max-width: 768px) {
+            .logo-marca {
+                font-size: 1.25rem;
+            }
+            
+            .contenedor-principal {
+                padding: 1rem 0;
+            }
+            
+            .tarjeta {
+                margin-bottom: 1rem;
+            }
+            
+            .pie-pagina {
+                padding: 2rem 0 1rem;
+            }
+        }
+    </style>
+    
+   
+</head>
+<body>
+    <!-- ===================================
+         BARRA DE NAVEGACIÓN
+    =================================== -->
+    <nav class="navbar navbar-expand-lg navbar-personalizada">
+        <div class="container">
+            <!-- Logo -->
+            <a class="logo-marca" href="{% url 'inicio' %}">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Sistema de Talleres</span>
+            </a>
+            
+            <!-- Botón menú móvil -->
+            <button class="navbar-toggler border-0 text-white" type="button" data-bs-toggle="collapse" data-bs-target="#menuNavegacion">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <!-- Menú de navegación -->
+            <div class="collapse navbar-collapse" id="menuNavegacion">
+                <ul class="navbar-nav me-auto ms-lg-4">
+                    <!-- Talleres -->
+                    <li class="nav-item">
+                        <a class="enlace-nav {% if request.resolver_match.url_name == 'catalogo_talleres' %}activo{% endif %}" 
+                           href="{% url 'catalogo_talleres' %}">
+                            <i class="fas fa-th-list"></i>
+                            Talleres
+                        </a>
+                    </li>
+                    
+                    
+                        <!-- Menú para PARTICIPANTE -->
+                        
+                            <li class="nav-item">
+                                <a class="enlace-nav {% if request.resolver_match.url_name == 'mis_talleres' %}activo{% endif %}" 
+                                   href="{% url 'mis_talleres' %}">
+                                    <i class="fas fa-book-open"></i>
+                                    Mis Talleres
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="enlace-nav {% if request.resolver_match.url_name == 'mis_certificados' %}activo{% endif %}" 
+                                   href="{% url 'mis_certificados' %}">
+                                    <i class="fas fa-certificate"></i>
+                                    Certificados
+                                </a>
+                            </li>
+                        
+                        <!-- Menú para INSTRUCTOR -->
+                    
+                            <li class="nav-item">
+                                <a class="enlace-nav {% if request.resolver_match.url_name == 'mis_talleres_instructor' %}activo{% endif %}" 
+                                   href="{% url 'mis_talleres_instructor' %}">
+                                    <i class="fas fa-chalkboard-teacher"></i>
+                                    Mis Talleres
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="enlace-nav" href="{% url 'crear_taller' %}">
+                                    <i class="fas fa-plus-circle"></i>
+                                    Crear Taller
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="enlace-nav" href="{% url 'estadisticas_instructor' %}">
+                                    <i class="fas fa-chart-line"></i>
+                                    Estadísticas
+                                </a>
+                            </li>
+                        
+                        <!-- Menú para ADMINISTRADOR -->
+                        
+                            <li class="nav-item">
+                                <a class="enlace-nav {% if request.resolver_match.url_name == 'dashboard_admin' %}activo{% endif %}" 
+                                   href="{% url 'dashboard_admin' %}">
+                                    <i class="fas fa-tachometer-alt"></i>
+                                    Panel
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="enlace-nav" href="{% url 'talleres_pendientes' %}">
+                                    <i class="fas fa-clock"></i>
+                                    Pendientes
+                                   
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="enlace-nav" href="{% url 'reporte_evaluaciones_general' %}">
+                                    <i class="fas fa-chart-bar"></i>
+                                    Reportes
+                                </a>
+                            </li>
+                       
+                </ul>
+                
+                <!-- Menú de usuario -->
+                <ul class="navbar-nav ms-auto">
+                 
+                        <li class="nav-item dropdown">
+                            <a class="enlace-nav dropdown-toggle" href="#" id="menuUsuario" 
+                               role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle"></i>
+                               
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end menu-desplegable">
+                                <li>
+                                    <a class="dropdown-item item-desplegable" href="{% url 'perfil' %}">
+                                        <i class="fas fa-user"></i>
+                                        Mi Perfil
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item item-desplegable" href="{% url 'cambiar_password' %}">
+                                        <i class="fas fa-key"></i>
+                                        Cambiar Contraseña
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item item-desplegable text-danger" href="{% url 'logout' %}">
+                                        <i class="fas fa-sign-out-alt"></i>
+                                        Cerrar Sesión
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                  
+                        <li class="nav-item">
+                            <a class="enlace-nav" href="{% url 'login' %}">
+                                <i class="fas fa-sign-in-alt"></i>
+                                Iniciar Sesión
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="boton boton-contorno btn-sm ms-2" href="{% url 'registro' %}">
+                                <i class="fas fa-user-plus"></i>
+                                Registrarse
+                            </a>
+                        </li>
+                   
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- ===================================
+         MENSAJES DEL SISTEMA
+    =================================== -->
+   
+        <div class="container mt-4">
+          
+                <div class="alerta alerta-{{ message.tags }} alert-dismissible fade show" role="alert">
+                   
+                        <i class="fas fa-exclamation-circle"></i>
+                    
+                        <i class="fas fa-check-circle"></i>
+                    
+                        <i class="fas fa-exclamation-triangle"></i>
+                    
+                        <i class="fas fa-info-circle"></i>
+                    
+                    <div>
+                        <strong></strong> 
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+        </div>
+
+    
+    <!-- ===================================
+         CONTENIDO PRINCIPAL
+    =================================== -->
+    <main class="container contenedor-principal">
+    </main>
+    
+    <!-- ===================================
+         PIE DE PÁGINA
+    =================================== -->
+    <footer class="pie-pagina">
+        <div class="container">
+            <div class="row">
+                <!-- Información -->
+                <div class="col-lg-4 mb-4 mb-lg-0">
+                    <h5>
+                        <i class="fas fa-graduation-cap me-2"></i>
+                        Sistema de Talleres
+                    </h5>
+                    <p class="text-muted">
+                        Plataforma integral para la gestión de talleres y seminarios universitarios.
+                    </p>
+                    <div class="redes-sociales">
+                        <a href="#" title="Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" title="Twitter">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" title="Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" title="LinkedIn">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Enlaces -->
+                <div class="col-lg-2 col-md-4 mb-4 mb-lg-0">
+                    <h5>Enlaces</h5>
+                    <a href="{% url 'inicio' %}">Inicio</a>
+                    <a href="{% url 'catalogo_talleres' %}">Talleres</a>
+                    <a href="{% url 'verificar_certificado' %}">Verificar Certificado</a>
+                </div>
+                
+                <!-- Soporte -->
+                <div class="col-lg-3 col-md-4 mb-4 mb-lg-0">
+                    <h5>Soporte</h5>
+                    <a href="#">Preguntas Frecuentes</a>
+                    <a href="#">Contacto</a>
+                    <a href="#">Términos y Condiciones</a>
+                    <a href="#">Política de Privacidad</a>
+                </div>
+                
+                <!-- Contacto -->
+                <div class="col-lg-3 col-md-4">
+                    <h5>Contacto</h5>
+                    <p class="mb-2">
+                        <i class="fas fa-envelope me-2"></i>
+                        talleres@universidad.edu
+                    </p>
+                    <p class="mb-2">
+                        <i class="fas fa-phone me-2"></i>
+                        +57 (123) 456-7890
+                    </p>
+                    <p class="mb-2">
+                        <i class="fas fa-map-marker-alt me-2"></i>
+
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Separador -->
+            <hr class="my-4" style="border-color: rgba(255,255,255,0.1);">
+            
+            <!-- Copyright -->
+            <div class="text-center">
+                <p class="mb-0">
+                    &copy; Sistema de Talleres. Todos los derechos reservados.
+                </p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- ===================================
+         SCRIPTS
+    =================================== -->
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- jQuery (opcional) -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    
+    <!-- Scripts personalizados -->
+    <script>
+        // Auto-cerrar alertas de éxito después de 5 segundos
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const alertasExito = document.querySelectorAll('.alerta-exito');
+                alertasExito.forEach(function(alerta) {
+                    const bsAlert = new bootstrap.Alert(alerta);
+                    bsAlert.close();
+                });
+            }, 5000);
+        });
+        
+        // Función para confirmar acciones importantes
+        function confirmarAccion(mensaje) {
+            return confirm(mensaje || '¿Estás seguro de realizar esta acción?');
+        }
+        
+        // Desplazamiento suave para enlaces internos
+        document.querySelectorAll('a[href^="#"]').forEach(enlace => {
+            enlace.addEventListener('click', function(evento) {
+                evento.preventDefault();
+                const destino = document.querySelector(this.getAttribute('href'));
+                if (destino) {
+                    destino.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

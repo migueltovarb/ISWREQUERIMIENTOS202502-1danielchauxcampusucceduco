@@ -1,0 +1,758 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Materiales - {{ taller.titulo }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .materials-header {
+        background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);
+        color: white;
+        border-radius: 20px;
+        padding: 3rem 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 20px 40px rgba(30, 58, 138, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .materials-header::before {
+        content: '📚';
+        position: absolute;
+        font-size: 15rem;
+        opacity: 0.1;
+        top: -3rem;
+        right: -3rem;
+        transform: rotate(-15deg);
+    }
+    
+    .materials-header h1 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .materials-header .breadcrumb-custom {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        padding: 0.75rem 1.25rem;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .stats-materials {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-material {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+    }
+    
+    .stat-material:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    }
+    
+    .stat-material-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        display: block;
+    }
+    
+    .stat-material-number {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #1F2937;
+        line-height: 1;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-material-label {
+        color: #6B7280;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+    
+    .filters-bar {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+    
+    .filter-chip {
+        padding: 0.75rem 1.5rem;
+        border-radius: 25px;
+        border: 2px solid #E5E7EB;
+        background: white;
+        color: #6B7280;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .filter-chip:hover {
+        border-color: #2563EB;
+        color: #2563EB;
+        transform: translateY(-2px);
+    }
+    
+    .filter-chip.active {
+        background: linear-gradient(135deg, #2563EB 0%, #1E40AF 100%);
+        color: white;
+        border-color: #2563EB;
+    }
+    
+    .filter-chip .count {
+        background: rgba(255, 255, 255, 0.3);
+        padding: 0.25rem 0.5rem;
+        border-radius: 10px;
+        font-size: 0.75rem;
+    }
+    
+    .filter-chip.active .count {
+        background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .material-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        border-left: 4px solid transparent;
+    }
+    
+    .material-card:hover {
+        box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        transform: translateX(5px);
+    }
+    
+    .material-icon-wrapper {
+        width: 80px;
+        height: 80px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        flex-shrink: 0;
+        position: relative;
+    }
+    
+    .material-icon-wrapper.pdf {
+        background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+        color: #DC2626;
+        border-left-color: #DC2626;
+    }
+    
+    .material-icon-wrapper.video {
+        background: linear-gradient(135deg, #E9D5FF 0%, #D8B4FE 100%);
+        color: #7C3AED;
+        border-left-color: #7C3AED;
+    }
+    
+    .material-icon-wrapper.presentacion {
+        background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+        color: #D97706;
+        border-left-color: #D97706;
+    }
+    
+    .material-icon-wrapper.enlace {
+        background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+        color: #059669;
+        border-left-color: #059669;
+    }
+    
+    .material-icon-wrapper.documento {
+        background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%);
+        color: #1E40AF;
+        border-left-color: #1E40AF;
+    }
+    
+    .material-icon-wrapper.otro {
+        background: linear-gradient(135deg, #F3F4F6 0%, #E5E7EB 100%);
+        color: #6B7280;
+        border-left-color: #6B7280;
+    }
+    
+    .badge-new {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+        color: white;
+        padding: 0.25rem 0.6rem;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        box-shadow: 0 4px 10px rgba(239, 68, 68, 0.4);
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+    
+    .material-content {
+        flex: 1;
+    }
+    
+    .material-title {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #1F2937;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .material-description {
+        color: #6B7280;
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
+        line-height: 1.5;
+    }
+    
+    .material-meta {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        color: #9CA3AF;
+        font-size: 0.875rem;
+    }
+    
+    .material-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .material-meta-item i {
+        color: #6B7280;
+    }
+    
+    .material-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        flex-shrink: 0;
+    }
+    
+    .btn-download {
+        background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        text-decoration: none;
+    }
+    
+    .btn-download:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        color: white;
+    }
+    
+    .btn-view {
+        background: white;
+        color: #2563EB;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 600;
+        border: 2px solid #2563EB;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+    }
+    
+    .btn-view:hover {
+        background: #2563EB;
+        color: white;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 5rem 2rem;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+    
+    .empty-state-icon {
+        font-size: 6rem;
+        color: #E5E7EB;
+        margin-bottom: 2rem;
+    }
+    
+    .empty-state h3 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #1F2937;
+        margin-bottom: 1rem;
+    }
+    
+    .info-banner {
+        background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-top: 2rem;
+        box-shadow: 0 4px 15px rgba(245, 158, 11, 0.2);
+    }
+    
+    .info-banner h5 {
+        color: #92400E;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .info-banner ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .info-banner li {
+        padding: 0.5rem 0;
+        color: #78350F;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .btn-upload {
+        background: linear-gradient(135deg, #2563EB 0%, #1E40AF 100%);
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .btn-upload:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="materials-header animate__animated animate__fadeInDown">
+    <div class="breadcrumb-custom mb-3">
+        <i class="fas fa-graduation-cap"></i>
+        <span>{{ taller.instructor.get_full_name }}</span>
+        <i class="fas fa-chevron-right small"></i>
+        <span>Materiales</span>
+    </div>
+    
+    <h1>📚 Materiales del Taller</h1>
+    <h3 class="mb-3 opacity-90">{{ taller.titulo }}</h3>
+    
+    <div class="d-flex gap-3 flex-wrap">
+        <span>
+            <i class="fas fa-calendar"></i>
+            {{ taller.fecha_inicio|date:"d/m/Y" }}
+        </span>
+        <span>
+            <i class="fas fa-clock"></i>
+            {{ taller.duracion_horas }} horas
+        </span>
+        <span>
+            <i class="fas fa-{{ taller.modalidad|yesno:'video,map-marker-alt,globe' }}"></i>
+            {{ taller.get_modalidad_display }}
+        </span>
+    </div>
+</div>
+
+<!-- Estadísticas -->
+<div class="stats-materials animate__animated animate__fadeInUp">
+    <div class="stat-material">
+        <span class="stat-material-icon">📄</span>
+        <div class="stat-material-number">{{ materiales.count }}</div>
+        <div class="stat-material-label">Total Materiales</div>
+    </div>
+    
+    <div class="stat-material">
+        <span class="stat-material-icon">📕</span>
+        <div class="stat-material-number">{{ materiales|length|default:0 }}</div>
+        <div class="stat-material-label">PDFs Disponibles</div>
+    </div>
+    
+    <div class="stat-material">
+        <span class="stat-material-icon">🎥</span>
+        <div class="stat-material-number">0</div>
+        <div class="stat-material-label">Videos</div>
+    </div>
+    
+    <div class="stat-material">
+        <span class="stat-material-icon">🔗</span>
+        <div class="stat-material-number">0</div>
+        <div class="stat-material-label">Enlaces</div>
+    </div>
+</div>
+
+<!-- Filtros -->
+<div class="filters-bar animate__animated animate__fadeIn">
+    <strong class="text-muted">Filtrar por tipo:</strong>
+    
+    <button class="filter-chip active" data-filter="all">
+        <i class="fas fa-th"></i>
+        <span>Todos</span>
+        <span class="count">{{ materiales.count }}</span>
+    </button>
+    
+    <button class="filter-chip" data-filter="pdf">
+        <i class="fas fa-file-pdf"></i>
+        <span>PDFs</span>
+        <span class="count">0</span>
+    </button>
+    
+    <button class="filter-chip" data-filter="video">
+        <i class="fas fa-video"></i>
+        <span>Videos</span>
+        <span class="count">0</span>
+    </button>
+    
+    <button class="filter-chip" data-filter="presentacion">
+        <i class="fas fa-file-powerpoint"></i>
+        <span>Presentaciones</span>
+        <span class="count">0</span>
+    </button>
+    
+    <button class="filter-chip" data-filter="enlace">
+        <i class="fas fa-link"></i>
+        <span>Enlaces</span>
+        <span class="count">0</span>
+    </button>
+    
+    <button class="filter-chip" data-filter="documento">
+        <i class="fas fa-file-word"></i>
+        <span>Documentos</span>
+        <span class="count">0</span>
+    </button>
+</div>
+
+<!-- Lista de Materiales -->
+<div id="materialsContainer">
+    {% if materiales %}
+        {% for material in materiales %}
+            <div class="material-card animate__animated animate__fadeInUp" 
+                 data-type="{{ material.tipo }}">
+                
+                <!-- Icono del Tipo -->
+                <div class="material-icon-wrapper {{ material.tipo }}">
+                    {% if material.tipo == 'pdf' %}
+                        <i class="fas fa-file-pdf"></i>
+                    {% elif material.tipo == 'video' %}
+                        <i class="fas fa-video"></i>
+                    {% elif material.tipo == 'presentacion' %}
+                        <i class="fas fa-file-powerpoint"></i>
+                    {% elif material.tipo == 'enlace' %}
+                        <i class="fas fa-link"></i>
+                    {% elif material.tipo == 'documento' %}
+                        <i class="fas fa-file-word"></i>
+                    {% else %}
+                        <i class="fas fa-file"></i>
+                    {% endif %}
+                    
+                    <!-- Badge NUEVO -->
+                    {% if material.fecha_subida|timesince|slice:":1" == "0" %}
+                        <span class="badge-new">NUEVO</span>
+                    {% endif %}
+                </div>
+                
+                <!-- Contenido -->
+                <div class="material-content">
+                    <h5 class="material-title">
+                        {{ material.titulo }}
+                    </h5>
+                    
+                    {% if material.descripcion %}
+                        <p class="material-description">
+                            {{ material.descripcion }}
+                        </p>
+                    {% endif %}
+                    
+                    <div class="material-meta">
+                        <span class="material-meta-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            Subido el {{ material.fecha_subida|date:"d/m/Y" }}
+                        </span>
+                        
+                        {% if material.tipo != 'enlace' and material.archivo %}
+                            <span class="material-meta-item">
+                                <i class="fas fa-weight-hanging"></i>
+                                {{ material.archivo.size|filesizeformat }}
+                            </span>
+                        {% endif %}
+                        
+                        <span class="material-meta-item">
+                            <i class="fas fa-tag"></i>
+                            {{ material.get_tipo_display }}
+                        </span>
+                        
+                        <span class="material-meta-item">
+                            <i class="fas fa-download"></i>
+                            {{ material.descargas|default:0 }} descarga{{ material.descargas|pluralize }}
+                        </span>
+                    </div>
+                </div>
+                
+                <!-- Acciones -->
+                <div class="material-actions">
+                    {% if material.tipo == 'enlace' %}
+                        <a href="{{ material.enlace }}" target="_blank" rel="noopener noreferrer" class="btn-download">
+                            <i class="fas fa-external-link-alt"></i>
+                            Abrir Enlace
+                        </a>
+                    {% else %}
+                        <a href="{% url 'descargar_material' material.id %}" class="btn-download" download>
+                            <i class="fas fa-download"></i>
+                            Descargar
+                        </a>
+                        {% if material.tipo == 'pdf' %}
+                            <a href="{% url 'descargar_material' material.id %}?preview=true" target="_blank" class="btn-view">
+                                <i class="fas fa-eye"></i>
+                                Vista Previa
+                            </a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <!-- Estado Vacío -->
+        <div class="empty-state animate__animated animate__fadeIn">
+            <div class="empty-state-icon">📭</div>
+            <h3>Aún no hay materiales disponibles</h3>
+            <p class="text-muted lead mb-4">
+                El instructor subirá los materiales antes del inicio del taller
+            </p>
+            <div class="alert-modern alert-info-modern d-inline-block">
+                <i class="fas fa-bell"></i>
+                <div>
+                    <strong>Te notificaremos por email</strong><br>
+                    Cuando haya nuevos materiales disponibles
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Banner Informativo -->
+{% if materiales %}
+<div class="info-banner animate__animated animate__fadeInUp">
+    <h5>
+        <i class="fas fa-info-circle"></i>
+        Información Importante
+    </h5>
+    <ul>
+        <li>
+            <i class="fas fa-check-circle"></i>
+            Los materiales están disponibles solo para participantes inscritos
+        </li>
+        <li>
+            <i class="fas fa-check-circle"></i>
+            Puedes descargar los materiales las veces que necesites
+        </li>
+        <li>
+            <i class="fas fa-check-circle"></i>
+            Algunos materiales pueden actualizarse durante el taller
+        </li>
+        <li>
+            <i class="fas fa-check-circle"></i>
+            Recibirás notificaciones cuando se agreguen nuevos materiales
+        </li>
+        <li>
+            <i class="fas fa-exclamation-triangle"></i>
+            Los materiales son solo para uso educativo y personal
+        </li>
+    </ul>
+</div>
+{% endif %}
+
+<!-- Botón de Gestión (Admin/Instructor) -->
+{% if puede_gestionar %}
+<div class="text-center mt-4">
+    <a href="{% url 'subir_material' taller.id %}" class="btn-upload">
+        <i class="fas fa-cloud-upload-alt"></i>
+        Subir Nuevo Material
+    </a>
+</div>
+{% endif %}
+
+<!-- Botón Volver -->
+<div class="text-center mt-4">
+    <a href="{% url 'detalle_taller' taller.id %}" class="btn btn-outline-primary btn-modern">
+        <i class="fas fa-arrow-left"></i>
+        Volver al Taller
+    </a>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Sistema de filtrado
+    const filterChips = document.querySelectorAll('.filter-chip');
+    const materialCards = document.querySelectorAll('.material-card');
+    
+    filterChips.forEach(chip => {
+        chip.addEventListener('click', function() {
+            // Remover active de todos
+            filterChips.forEach(c => c.classList.remove('active'));
+            
+            // Agregar active al clickeado
+            this.classList.add('active');
+            
+            const filter = this.dataset.filter;
+            
+            // Filtrar cards
+            materialCards.forEach(card => {
+                const cardType = card.dataset.type;
+                
+                if (filter === 'all' || cardType === filter) {
+                    card.style.display = 'flex';
+                    card.classList.add('animate__fadeIn');
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // Verificar si hay resultados
+            const visibleCards = Array.from(materialCards).filter(c => c.style.display !== 'none');
+            
+            if (visibleCards.length === 0) {
+                showNoResults(filter);
+            } else {
+                hideNoResults();
+            }
+        });
+    });
+    
+    // Mostrar mensaje cuando no hay resultados
+    function showNoResults(filter) {
+        const existing = document.getElementById('noResults');
+        if (existing) return;
+        
+        const container = document.getElementById('materialsContainer');
+        const noResults = document.createElement('div');
+        noResults.id = 'noResults';
+        noResults.className = 'empty-state animate__animated animate__fadeIn';
+        noResults.innerHTML = `
+            <div class="empty-state-icon">🔍</div>
+            <h3>No hay materiales de este tipo</h3>
+            <p class="text-muted">Intenta con otro filtro</p>
+        `;
+        container.appendChild(noResults);
+    }
+    
+    function hideNoResults() {
+        const existing = document.getElementById('noResults');
+        if (existing) {
+            existing.remove();
+        }
+    }
+    
+    // Confirmación para archivos grandes
+    const downloadButtons = document.querySelectorAll('.btn-download');
+    downloadButtons.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            const size = this.closest('.material-card').querySelector('.fa-weight-hanging')?.nextSibling?.textContent;
+            
+            if (size && (size.includes('MB') || size.includes('GB'))) {
+                const sizeNum = parseFloat(size);
+                if (sizeNum > 50) {
+                    if (!confirm(`Este archivo es grande (${size}). ¿Deseas continuar con la descarga?`)) {
+                        e.preventDefault();
+                    }
+                }
+            }
+        });
+    });
+    
+    // Animación al hacer scroll
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate__animated', 'animate__fadeInUp');
+            }
+        });
+    }, { threshold: 0.1 });
+    
+    materialCards.forEach(card => observer.observe(card));
+    
+    // Toast de descarga iniciada
+    document.querySelectorAll('.btn-download').forEach(btn => {
+        if (!btn.href.includes('enlace')) {
+            btn.addEventListener('click', function() {
+                showToast('📥 Descarga iniciada', 'success');
+            });
+        }
+    });
+    
+    function showToast(message, type) {
+        const toast = document.createElement('div');
+        toast.className = `alert-modern alert-${type}-modern`;
+        toast.style.position = 'fixed';
+        toast.style.top = '100px';
+        toast.style.right = '20px';
+        toast.style.zIndex = '9999';
+        toast.style.minWidth = '300px';
+        toast.innerHTML = `<i class="fas fa-check-circle"></i><div>${message}</div>`;
+        
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.classList.add('animate__animated', 'animate__fadeOut');
+            setTimeout(() => toast.remove(), 1000);
+        }, 3000);
+    }
+</script>
