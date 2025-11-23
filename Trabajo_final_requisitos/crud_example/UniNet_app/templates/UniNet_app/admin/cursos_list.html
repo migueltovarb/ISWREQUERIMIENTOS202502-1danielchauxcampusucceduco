@@ -1,0 +1,100 @@
+{% extends 'UniNet_app/base.html' %}
+
+{% block title %}Gestión de Cursos - UniNet{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2 class="fw-bold">
+            <i class="bi bi-book-fill"></i> Gestión de Cursos
+        </h2>
+        <p class="text-muted">Administra todos los cursos del sistema</p>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{% url 'curso_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Nuevo Curso
+        </a>
+        <a href="{% url 'dashboard_admin' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Volver
+        </a>
+    </div>
+</div>
+
+<!-- Tabla de Cursos -->
+<div class="card shadow-sm">
+    <div class="card-body">
+        {% if dataset %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Código</th>
+                            <th>Nombre</th>
+                            <th>Créditos</th>
+                            <th>Tipo</th>
+                            <th>Cupo Máximo</th>
+                            <th>Periodo</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for curso in dataset %}
+                            <tr>
+                                <td><strong>{{ curso.codigo }}</strong></td>
+                                <td>{{ curso.nombre }}</td>
+                                <td>
+                                    <span class="badge bg-info">{{ curso.creditos }}</span>
+                                </td>
+                                <td>
+                                    <span class="badge {% if curso.tipo == 'extension' %}bg-warning text-dark{% else %}bg-primary{% endif %}">
+                                        {{ curso.get_tipo_display }}
+                                    </span>
+                                </td>
+                                <td>{{ curso.cupo_maximo }}</td>
+                                <td>
+                                    {% if curso.periodo %}
+                                        {{ curso.periodo.nombre }}
+                                    {% else %}
+                                        <span class="text-muted">N/A</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if curso.activo %}
+                                        <span class="badge bg-success">Activo</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Inactivo</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{% url 'curso_update' curso.id %}" 
+                                           class="btn btn-outline-primary" 
+                                           title="Editar">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a href="{% url 'curso_delete' curso.id %}" 
+                                           class="btn btn-outline-danger" 
+                                           title="Eliminar">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-inbox" style="font-size: 4rem; color: #ccc;"></i>
+                <h4 class="mt-3">No hay cursos registrados</h4>
+                <p class="text-muted">Comienza creando un nuevo curso</p>
+                <a href="{% url 'curso_create' %}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Crear Primer Curso
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,188 @@
+{% extends 'UniNet_app/base.html' %}
+
+{% block title %}Dashboard Administrativo - UniNet{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="fw-bold">
+            <i class="bi bi-speedometer2"></i> Dashboard Administrativo
+        </h2>
+        <p class="text-muted">Panel de control y estadísticas del sistema</p>
+    </div>
+</div>
+
+<!-- Periodo Actual -->
+{% if periodo_actual %}
+<div class="alert alert-primary d-flex align-items-center">
+    <i class="bi bi-calendar-check-fill me-3" style="font-size: 2rem;"></i>
+    <div>
+        <strong>Periodo Actual: {{ periodo_actual.nombre }}</strong><br>
+        <small>{{ periodo_actual.fecha_inicio|date:"d/m/Y" }} - {{ periodo_actual.fecha_fin|date:"d/m/Y" }}</small>
+    </div>
+</div>
+{% endif %}
+
+<!-- Estadísticas Principales -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card border-primary shadow-sm card-hover" style="border-width: 2px;">
+            <div class="card-body text-center">
+                <div class="text-primary mb-3">
+                    <i class="bi bi-people-fill" style="font-size: 3.5rem;"></i>
+                </div>
+                <h2 class="fw-bold mb-0">{{ total_estudiantes }}</h2>
+                <p class="text-muted mb-0">Estudiantes Activos</p>
+                <a href="#" class="btn btn-sm btn-outline-primary mt-2">Ver más</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card border-success shadow-sm card-hover" style="border-width: 2px;">
+            <div class="card-body text-center">
+                <div class="text-success mb-3">
+                    <i class="bi bi-book-fill" style="font-size: 3.5rem;"></i>
+                </div>
+                <h2 class="fw-bold mb-0">{{ total_cursos }}</h2>
+                <p class="text-muted mb-0">Cursos Activos</p>
+                <a href="{% url 'cursos_admin_list' %}" class="btn btn-sm btn-outline-success mt-2">Ver más</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card border-info shadow-sm card-hover" style="border-width: 2px;">
+            <div class="card-body text-center">
+                <div class="text-info mb-3">
+                    <i class="bi bi-person-badge-fill" style="font-size: 3.5rem;"></i>
+                </div>
+                <h2 class="fw-bold mb-0">{{ total_profesores }}</h2>
+                <p class="text-muted mb-0">Profesores</p>
+                <a href="{% url 'profesores_admin_list' %}" class="btn btn-sm btn-outline-info mt-2">Ver más</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card border-warning shadow-sm card-hover" style="border-width: 2px;">
+            <div class="card-body text-center">
+                <div class="text-warning mb-3">
+                    <i class="bi bi-pencil-square" style="font-size: 3.5rem;"></i>
+                </div>
+                <h2 class="fw-bold mb-0">{{ inscripciones_periodo }}</h2>
+                <p class="text-muted mb-0">Inscripciones</p>
+                <a href="#" class="btn btn-sm btn-outline-warning mt-2">Ver más</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Accesos Rápidos -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-lightning-fill"></i> Accesos Rápidos</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <a href="{% url 'curso_create' %}" class="btn btn-outline-primary w-100">
+                            <i class="bi bi-plus-circle"></i><br>Crear Curso
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{% url 'horario_create' %}" class="btn btn-outline-success w-100">
+                            <i class="bi bi-calendar-plus"></i><br>Crear Horario
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{% url 'profesor_create' %}" class="btn btn-outline-info w-100">
+                            <i class="bi bi-person-plus"></i><br>Crear Profesor
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{% url 'periodo_create' %}" class="btn btn-outline-warning w-100">
+                            <i class="bi bi-calendar-event"></i><br>Crear Periodo
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cursos Más Populares -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-graph-up-arrow"></i> Cursos Más Populares
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if cursos_populares %}
+                    <div class="list-group list-group-flush">
+                        {% for curso in cursos_populares %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ curso.codigo }}</strong><br>
+                                    <small class="text-muted">{{ curso.nombre }}</small>
+                                </div>
+                                <span class="badge bg-success rounded-pill">
+                                    {{ curso.total_inscritos }} inscritos
+                                </span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center mb-0">No hay datos disponibles</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-bar-chart-fill"></i> Actividad Reciente
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-person-check text-success me-3" style="font-size: 1.5rem;"></i>
+                            <div>
+                                <strong>Nueva inscripción</strong><br>
+                                <small class="text-muted">Hace 5 minutos</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-book text-primary me-3" style="font-size: 1.5rem;"></i>
+                            <div>
+                                <strong>Nuevo curso creado</strong><br>
+                                <small class="text-muted">Hace 1 hora</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-credit-card text-warning me-3" style="font-size: 1.5rem;"></i>
+                            <div>
+                                <strong>Pago procesado</strong><br>
+                                <small class="text-muted">Hace 2 horas</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

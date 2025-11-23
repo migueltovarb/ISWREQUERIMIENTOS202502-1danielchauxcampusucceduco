@@ -1,0 +1,169 @@
+{% extends 'UniNet_app/base.html' %}
+
+{% block title %}UniNet - Inicio{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="card border-0 shadow-lg" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <div class="card-body text-white p-5">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="display-4 fw-bold mb-3">
+                            <i class="bi bi-mortarboard-fill"></i> Bienvenido a UniNet
+                        </h1>
+                        <p class="lead mb-4">
+                            Sistema de inscripción a cursos universitarios. Gestiona tus inscripciones de manera fácil y rápida.
+                        </p>
+                        {% if not user.is_authenticated %}
+                            <div class="d-flex gap-3">
+                                <a href="{% url 'registro_estudiante' %}" class="btn btn-light btn-lg">
+                                    <i class="bi bi-person-plus"></i> Registrarse
+                                </a>
+                                <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg">
+                                    <i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión
+                                </a>
+                            </div>
+                        {% else %}
+                            <a href="{% url 'cursos_list' %}" class="btn btn-light btn-lg">
+                                <i class="bi bi-book"></i> Ver Cursos Disponibles
+                            </a>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-4 text-center d-none d-md-block">
+                        <i class="bi bi-book" style="font-size: 10rem; opacity: 0.3;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Estadísticas -->
+<div class="row mb-5 g-4">
+    <div class="col-md-4">
+        <div class="card text-center shadow-sm card-hover border-primary" style="border-width: 2px;">
+            <div class="card-body p-4">
+                <div class="text-primary mb-3">
+                    <i class="bi bi-book-fill" style="font-size: 3rem;"></i>
+                </div>
+                <h2 class="fw-bold">{{ total_cursos }}</h2>
+                <p class="text-muted mb-0">Cursos Disponibles</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center shadow-sm card-hover border-success" style="border-width: 2px;">
+            <div class="card-body p-4">
+                <div class="text-success mb-3">
+                    <i class="bi bi-people-fill" style="font-size: 3rem;"></i>
+                </div>
+                <h2 class="fw-bold">{{ total_estudiantes }}</h2>
+                <p class="text-muted mb-0">Estudiantes Activos</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center shadow-sm card-hover border-info" style="border-width: 2px;">
+            <div class="card-body p-4">
+                <div class="text-info mb-3">
+                    <i class="bi bi-calendar-check-fill" style="font-size: 3rem;"></i>
+                </div>
+                <h2 class="fw-bold">{{ periodo_actual.nombre|default:"N/A" }}</h2>
+                <p class="text-muted mb-0">Periodo Actual</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Características -->
+<div class="row mb-5">
+    <div class="col-12 text-center mb-4">
+        <h2 class="fw-bold">¿Por qué usar UniNet?</h2>
+        <p class="text-muted">Descubre las ventajas de nuestro sistema</p>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+    <div class="col-md-3">
+        <div class="card h-100 text-center shadow-sm card-hover">
+            <div class="card-body">
+                <div class="text-primary mb-3">
+                    <i class="bi bi-lightning-charge-fill" style="font-size: 2.5rem;"></i>
+                </div>
+                <h5 class="fw-bold">Rápido y Fácil</h5>
+                <p class="text-muted">Inscríbete en segundos sin complicaciones</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100 text-center shadow-sm card-hover">
+            <div class="card-body">
+                <div class="text-success mb-3">
+                    <i class="bi bi-shield-check-fill" style="font-size: 2.5rem;"></i>
+                </div>
+                <h5 class="fw-bold">Seguro</h5>
+                <p class="text-muted">Tus datos están protegidos</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100 text-center shadow-sm card-hover">
+            <div class="card-body">
+                <div class="text-warning mb-3">
+                    <i class="bi bi-clock-fill" style="font-size: 2.5rem;"></i>
+                </div>
+                <h5 class="fw-bold">24/7</h5>
+                <p class="text-muted">Acceso en cualquier momento</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100 text-center shadow-sm card-hover">
+            <div class="card-body">
+                <div class="text-info mb-3">
+                    <i class="bi bi-bell-fill" style="font-size: 2.5rem;"></i>
+                </div>
+                <h5 class="fw-bold">Notificaciones</h5>
+                <p class="text-muted">Te mantenemos informado</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Información del Periodo Actual -->
+{% if periodo_actual %}
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-calendar-event"></i> Periodo Académico Actual
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Periodo:</strong> {{ periodo_actual.nombre }}</p>
+                        <p><strong>Fechas:</strong> {{ periodo_actual.fecha_inicio }} - {{ periodo_actual.fecha_fin }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Inscripciones:</strong> {{ periodo_actual.fecha_inicio_inscripciones }} - {{ periodo_actual.fecha_fin_inscripciones }}</p>
+                        {% if periodo_actual.permite_inscripciones %}
+                            <span class="badge bg-success badge-custom">
+                                <i class="bi bi-check-circle"></i> Inscripciones Abiertas
+                            </span>
+                        {% else %}
+                            <span class="badge bg-danger badge-custom">
+                                <i class="bi bi-x-circle"></i> Inscripciones Cerradas
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

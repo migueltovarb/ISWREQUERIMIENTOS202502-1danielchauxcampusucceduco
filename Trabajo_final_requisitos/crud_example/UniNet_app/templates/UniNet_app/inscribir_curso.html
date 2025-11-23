@@ -1,0 +1,120 @@
+{% extends 'UniNet_app/base.html' %}
+
+{% block title %}Inscribir Curso - UniNet{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-7">
+        <div class="card shadow-lg border-0">
+            <div class="card-header bg-primary text-white py-4">
+                <h3 class="mb-0 text-center">
+                    <i class="bi bi-pencil-square"></i> Confirmar Inscripción
+                </h3>
+            </div>
+            <div class="card-body p-4">
+                <!-- Información del Curso -->
+                <div class="alert alert-info">
+                    <h5 class="alert-heading">
+                        <i class="bi bi-info-circle"></i> Detalles del Curso
+                    </h5>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-2">
+                                <strong>Código:</strong> {{ horario.curso.codigo }}
+                            </p>
+                            <p class="mb-2">
+                                <strong>Nombre:</strong> {{ horario.curso.nombre }}
+                            </p>
+                            <p class="mb-2">
+                                <strong>Créditos:</strong> {{ horario.curso.creditos }}
+                            </p>
+                            <p class="mb-2">
+                                <strong>Tipo:</strong> 
+                                <span class="badge {% if horario.curso.tipo == 'extension' %}bg-warning text-dark{% else %}bg-primary{% endif %}">
+                                    {{ horario.curso.get_tipo_display }}
+                                </span>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-2">
+                                <strong>Profesor:</strong> {{ horario.profesor.user.get_full_name }}
+                            </p>
+                            <p class="mb-2">
+                                <strong>Horario:</strong> {{ horario.get_dia_semana_display }}
+                            </p>
+                            <p class="mb-2">
+                                <strong>Hora:</strong> {{ horario.hora_inicio|time:"H:i" }} - {{ horario.hora_fin|time:"H:i" }}
+                            </p>
+                            <p class="mb-2">
+                                <strong>Aula:</strong> {{ horario.aula }}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    {% if horario.curso.tipo == 'extension' %}
+                        <hr>
+                        <div class="text-center">
+                            <h4 class="mb-0">
+                                <i class="bi bi-cash-stack"></i> 
+                                Costo: <span class="text-danger">${{ horario.curso.costo }}</span>
+                            </h4>
+                            <small class="text-muted">Este curso requiere pago</small>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Descripción del Curso -->
+                <div class="mb-4">
+                    <h5><i class="bi bi-card-text"></i> Descripción</h5>
+                    <p class="text-muted">{{ horario.curso.descripcion }}</p>
+                </div>
+
+                {% if horario.curso.requisitos %}
+                    <div class="mb-4">
+                        <h5><i class="bi bi-list-check"></i> Requisitos</h5>
+                        <p class="text-muted">{{ horario.curso.requisitos }}</p>
+                    </div>
+                {% endif %}
+
+                <!-- Cupos Disponibles -->
+                <div class="mb-4">
+                    <h5><i class="bi bi-people"></i> Disponibilidad</h5>
+                    {% with cupos_restantes=horario.calcular_cupos_restantes %}
+                        <div class="progress" style="height: 30px;">
+                            {% widthratio horario.cupo_actual horario.cupo_maximo 100 as porcentaje %}
+                            <div class="progress-bar {% if cupos_restantes == 0 %}bg-danger{% elif cupos_restantes < 5 %}bg-warning{% else %}bg-success{% endif %}" 
+                                 role="progressbar" 
+                                 style="width: {{ porcentaje }}%;">
+                                <strong>{{ cupos_restantes }} cupos disponibles de {{ horario.cupo_maximo }}</strong>
+                            </div>
+                        </div>
+                    {% endwith %}
+                </div>
+
+                <!-- Formulario de Confirmación -->
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <strong>Importante:</strong> Al confirmar la inscripción, estás aceptando los términos y condiciones del curso.
+                        {% if horario.curso.tipo == 'extension' %}
+                        Serás redirigido a la página de pago.
+                        {% endif %}
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-check-circle"></i> Confirmar Inscripción
+                        </button>
+                        <a href="{% url 'cursos_list' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

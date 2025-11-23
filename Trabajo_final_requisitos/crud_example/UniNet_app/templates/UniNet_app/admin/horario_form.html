@@ -1,0 +1,128 @@
+{% extends 'UniNet_app/base.html' %}
+
+{% block title %}{{ accion }} Horario - UniNet{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-lg border-0">
+            <div class="card-header bg-success text-white py-4">
+                <h3 class="mb-0">
+                    <i class="bi bi-calendar3"></i> {{ accion }} Horario
+                </h3>
+            </div>
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.curso.id_for_label }}" class="form-label">
+                                {{ form.curso.label }} *
+                            </label>
+                            {{ form.curso }}
+                            {% if form.curso.errors %}
+                                <div class="text-danger small">{{ form.curso.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.profesor.id_for_label }}" class="form-label">
+                                {{ form.profesor.label }} *
+                            </label>
+                            {{ form.profesor }}
+                            {% if form.profesor.errors %}
+                                <div class="text-danger small">{{ form.profesor.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.dia_semana.id_for_label }}" class="form-label">
+                                {{ form.dia_semana.label }} *
+                            </label>
+                            {{ form.dia_semana }}
+                            {% if form.dia_semana.errors %}
+                                <div class="text-danger small">{{ form.dia_semana.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.hora_inicio.id_for_label }}" class="form-label">
+                                {{ form.hora_inicio.label }} *
+                            </label>
+                            {{ form.hora_inicio }}
+                            {% if form.hora_inicio.errors %}
+                                <div class="text-danger small">{{ form.hora_inicio.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.hora_fin.id_for_label }}" class="form-label">
+                                {{ form.hora_fin.label }} *
+                            </label>
+                            {{ form.hora_fin }}
+                            {% if form.hora_fin.errors %}
+                                <div class="text-danger small">{{ form.hora_fin.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.aula.id_for_label }}" class="form-label">
+                                {{ form.aula.label }} *
+                            </label>
+                            {{ form.aula }}
+                            {% if form.aula.errors %}
+                                <div class="text-danger small">{{ form.aula.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.cupo_maximo.id_for_label }}" class="form-label">
+                                {{ form.cupo_maximo.label }} *
+                            </label>
+                            {{ form.cupo_maximo }}
+                            {% if form.cupo_maximo.errors %}
+                                <div class="text-danger small">{{ form.cupo_maximo.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.periodo.id_for_label }}" class="form-label">
+                                {{ form.periodo.label }} *
+                            </label>
+                            {{ form.periodo }}
+                            {% if form.periodo.errors %}
+                                <div class="text-danger small">{{ form.periodo.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            {{ form.activo }}
+                            <label class="form-check-label" for="{{ form.activo.id_for_label }}">
+                                {{ form.activo.label }}
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'horarios_admin_list' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle"></i> Guardar Horario
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

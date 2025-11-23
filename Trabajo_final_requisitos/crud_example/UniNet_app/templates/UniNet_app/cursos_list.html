@@ -1,0 +1,56 @@
+{% extends 'UniNet_app/base.html' %}
+
+{% block content %}
+<h1>Cursos Disponibles</h1>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-6">
+                <input type="text" name="q" class="form-control" placeholder="Buscar curso...">
+            </div>
+            <div class="col-md-4">
+                <select name="tipo" class="form-select">
+                    <option value="todos">Todos</option>
+                    <option value="regular">Regulares</option>
+                    <option value="extension">Extensión</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Buscar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    {% for horario in horarios %}
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>{{ horario.curso.nombre }}</h5>
+                <small>{{ horario.curso.codigo }}</small>
+            </div>
+            <div class="card-body">
+                <p><strong>Profesor:</strong> {{ horario.profesor.user.get_full_name }}</p>
+                <p><strong>Horario:</strong> {{ horario.get_dia_semana_display }} {{ horario.hora_inicio }}</p>
+                <p><strong>Cupos:</strong> {{ horario.calcular_cupos_restantes }} / {{ horario.cupo_maximo }}</p>
+            </div>
+            <div class="card-footer">
+                {% if horario.id in inscripciones_estudiante %}
+                    <button class="btn btn-success w-100" disabled>Ya inscrito</button>
+                {% elif horario.verificar_cupo_disponible %}
+                    <a href="{% url 'inscribir_curso' horario.id %}" class="btn btn-primary w-100">Inscribirse</a>
+                {% else %}
+                    <button class="btn btn-secondary w-100" disabled>Sin cupos</button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-info">No hay cursos disponibles.</div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

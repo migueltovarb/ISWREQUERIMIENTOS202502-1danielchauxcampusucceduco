@@ -1,0 +1,85 @@
+{% extends 'UniNet_app/base.html' %}
+
+{% block title %}Gestión de Periodos - UniNet{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2 class="fw-bold">
+            <i class="bi bi-calendar-event"></i> Gestión de Periodos Académicos
+        </h2>
+        <p class="text-muted">Administra los periodos académicos</p>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{% url 'periodo_create' %}" class="btn btn-warning">
+            <i class="bi bi-plus-circle"></i> Nuevo Periodo
+        </a>
+        <a href="{% url 'dashboard_admin' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Volver
+        </a>
+    </div>
+</div>
+
+<div class="row g-4">
+    {% if dataset %}
+        {% for periodo in dataset %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm h-100 {% if periodo.activo %}border-success{% endif %}" 
+                     style="{% if periodo.activo %}border-width: 2px;{% endif %}">
+                    <div class="card-header {% if periodo.activo %}bg-success text-white{% else %}bg-light{% endif %}">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">{{ periodo.nombre }}</h5>
+                            {% if periodo.activo %}
+                                <span class="badge bg-light text-success">ACTIVO</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-2">
+                            <strong><i class="bi bi-calendar3"></i> Periodo:</strong><br>
+                            {{ periodo.fecha_inicio|date:"d/m/Y" }} - {{ periodo.fecha_fin|date:"d/m/Y" }}
+                        </p>
+                        <p class="mb-2">
+                            <strong><i class="bi bi-pencil-square"></i> Inscripciones:</strong><br>
+                            {{ periodo.fecha_inicio_inscripciones|date:"d/m/Y" }} - {{ periodo.fecha_fin_inscripciones|date:"d/m/Y" }}
+                        </p>
+                        {% if periodo.descripcion %}
+                            <p class="mb-2 text-muted">
+                                <small>{{ periodo.descripcion|truncatewords:15 }}</small>
+                            </p>
+                        {% endif %}
+                        
+                        <div class="mt-3">
+                            {% if periodo.permite_inscripciones %}
+                                <span class="badge bg-success w-100 mb-2">
+                                    <i class="bi bi-check-circle"></i> Inscripciones Abiertas
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card-footer bg-light">
+                        <div class="btn-group w-100">
+                            <a href="{% url 'periodo_update' periodo.id %}" 
+                               class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-pencil"></i> Editar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-calendar-x" style="font-size: 4rem; color: #ccc;"></i>
+                    <h4 class="mt-3">No hay periodos académicos registrados</h4>
+                    <a href="{% url 'periodo_create' %}" class="btn btn-warning mt-2">
+                        <i class="bi bi-plus-circle"></i> Crear Primer Periodo
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

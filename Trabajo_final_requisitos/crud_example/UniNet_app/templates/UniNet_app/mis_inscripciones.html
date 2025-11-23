@@ -1,0 +1,103 @@
+{% extends 'UniNet_app/base.html' %}
+
+{% block title %}Mis Inscripciones - UniNet{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="fw-bold">
+            <i class="bi bi-list-check"></i> Mis Inscripciones
+        </h2>
+        <p class="text-muted">Administra tus cursos inscritos</p>
+    </div>
+</div>
+
+{% if inscripciones %}
+    <div class="row g-4">
+        {% for inscripcion in inscripciones %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <!-- Header según estado -->
+                    <div class="card-header 
+                        {% if inscripcion.estado == 'confirmada' %}bg-success
+                        {% elif inscripcion.estado == 'pendiente' %}bg-warning
+                        {% elif inscripcion.estado == 'cancelada' %}bg-danger
+                        {% else %}bg-secondary
+                        {% endif %} text-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">{{ inscripcion.horario.curso.codigo }}</span>
+                            <span class="badge bg-light text-dark">
+                                {{ inscripcion.get_estado_display }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">{{ inscripcion.horario.curso.nombre }}</h5>
+                        
+                        <div class="mb-3">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-person-fill text-primary me-2"></i>
+                                <small>{{ inscripcion.horario.profesor.user.get_full_name }}</small>
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-calendar3 text-success me-2"></i>
+                                <small>{{ inscripcion.horario.get_dia_semana_display }}</small>
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-clock text-info me-2"></i>
+                                <small>{{ inscripcion.horario.hora_inicio|time:"H:i" }} - {{ inscripcion.horario.hora_fin|time:"H:i" }}</small>
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-geo-alt text-danger me-2"></i>
+                                <small>Aula {{ inscripcion.horario.aula }}</small>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-calendar-check text-muted me-2"></i>
+                                <small>Inscrito: {{ inscripcion.fecha_inscripcion|date:"d/m/Y" }}</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Calificación y asistencia si está disponible -->
+                        {% if inscripcion.calificacion %}
+                            <div class="alert alert-info mb-3">
+                                <strong>Calificación:</strong> {{ inscripcion.calificacion }}<br>
+                                <strong>Asistencia:</strong> {{ inscripcion.asistencia }}%
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Acciones según estado -->
+                        {% if inscripcion.estado == 'pendiente' %}
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'procesar_pago' inscripcion.id %}" class="btn btn-warning">
+                                    <i class="bi bi-credit-card"></i> Procesar Pago
+                                </a>
+                                <a href="{% url 'cancelar_inscripcion' inscripcion.id %}" class="btn btn-outline-danger btn-sm">
+                                    <i class="bi bi-x-circle"></i> Cancelar
+                                </a>
+                            </div>
+                        {% elif inscripcion.estado == 'confirmada' %}
+                            <div class="d-grid">
+                                <a href="{% url 'cancelar_inscripcion' inscripcion.id %}" class="btn btn-outline-danger btn-sm">
+                                    <i class="bi bi-x-circle"></i> Cancelar Inscripción
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="card shadow-sm">
+        <div class="card-body text-center py-5">
+            <i class="bi bi-inbox" style="font-size: 5rem; color: #ccc;"></i>
+            <h4 class="mt-3">No tienes inscripciones aún</h4>
+            <p class="text-muted mb-4">Explora los cursos disponibles y comienza a inscribirte</p>
+            <a href="{% url 'cursos_list' %}" class="btn btn-primary">
+                <i class="bi bi-book"></i> Ver Cursos Disponibles
+            </a>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

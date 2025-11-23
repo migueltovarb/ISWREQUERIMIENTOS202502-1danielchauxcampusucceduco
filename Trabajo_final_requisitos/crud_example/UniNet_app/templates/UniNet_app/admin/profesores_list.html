@@ -1,0 +1,84 @@
+{% extends 'UniNet_app/base.html' %}
+
+{% block title %}Gestión de Profesores - UniNet{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2 class="fw-bold">
+            <i class="bi bi-person-badge-fill"></i> Gestión de Profesores
+        </h2>
+        <p class="text-muted">Administra el personal docente</p>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{% url 'profesor_create' %}" class="btn btn-info text-white">
+            <i class="bi bi-plus-circle"></i> Nuevo Profesor
+        </a>
+        <a href="{% url 'dashboard_admin' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Volver
+        </a>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        {% if dataset %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-info">
+                        <tr>
+                            <th>Código</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Especialidad</th>
+                            <th>Departamento</th>
+                            <th>Teléfono</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for profesor in dataset %}
+                            <tr>
+                                <td><strong>{{ profesor.codigo_profesor }}</strong></td>
+                                <td>{{ profesor.user.get_full_name }}</td>
+                                <td>{{ profesor.email_institucional }}</td>
+                                <td>{{ profesor.especialidad }}</td>
+                                <td>{{ profesor.departamento }}</td>
+                                <td>{{ profesor.telefono }}</td>
+                                <td>
+                                    {% if profesor.activo %}
+                                        <span class="badge bg-success">Activo</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Inactivo</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{% url 'profesor_update' profesor.id %}" 
+                                           class="btn btn-outline-primary">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a href="{% url 'profesor_delete' profesor.id %}" 
+                                           class="btn btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-person-x" style="font-size: 4rem; color: #ccc;"></i>
+                <h4 class="mt-3">No hay profesores registrados</h4>
+                <a href="{% url 'profesor_create' %}" class="btn btn-info text-white mt-2">
+                    <i class="bi bi-plus-circle"></i> Registrar Primer Profesor
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

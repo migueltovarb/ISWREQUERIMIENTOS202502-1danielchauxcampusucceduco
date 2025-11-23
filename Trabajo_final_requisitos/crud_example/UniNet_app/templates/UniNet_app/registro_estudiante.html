@@ -1,0 +1,535 @@
+{% extends 'UniNet_app/base.html' %}
+
+{% block title %}Registro de Estudiante - UniNet{% endblock %}
+
+{% block extra_css %}
+<style>
+    .step-wizard {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+    }
+    
+    .step-item {
+        flex: 1;
+        text-align: center;
+        position: relative;
+        padding: 1rem 0;
+    }
+    
+    .step-item::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: #e9ecef;
+        z-index: 1;
+    }
+    
+    .step-item:first-child::before {
+        left: 50%;
+    }
+    
+    .step-item:last-child::before {
+        right: 50%;
+    }
+    
+    .step-number {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #e9ecef;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        position: relative;
+        z-index: 2;
+        transition: all 0.3s;
+    }
+    
+    .step-item.active .step-number {
+        background: #0d6efd;
+        color: white;
+    }
+    
+    .step-item.completed .step-number {
+        background: #198754;
+        color: white;
+    }
+    
+    .step-item.completed .step-number i {
+        display: block;
+    }
+    
+    .step-label {
+        display: block;
+        margin-top: 0.5rem;
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+    
+    .step-item.active .step-label {
+        color: #0d6efd;
+        font-weight: bold;
+    }
+    
+    .form-section {
+        display: none;
+    }
+    
+    .form-section.active {
+        display: block;
+        animation: fadeIn 0.3s;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .password-strength {
+        height: 5px;
+        margin-top: 0.5rem;
+        border-radius: 3px;
+        transition: all 0.3s;
+    }
+    
+    .password-strength.weak { background: #dc3545; width: 33%; }
+    .password-strength.medium { background: #ffc107; width: 66%; }
+    .password-strength.strong { background: #198754; width: 100%; }
+    
+    .input-icon {
+        position: relative;
+    }
+    
+    .input-icon i {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+    }
+    
+    .input-icon input {
+        padding-left: 40px;
+    }
+    
+    .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    
+    .is-valid-custom {
+        border-color: #198754;
+    }
+    
+    .is-invalid-custom {
+        border-color: #dc3545;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10 col-lg-9">
+        <div class="card shadow-lg border-0">
+            <div class="card-header bg-gradient text-white py-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <h3 class="mb-0 text-center">
+                    <i class="bi bi-person-plus-fill"></i> Registro de Estudiante
+                </h3>
+                <p class="mb-0 text-center mt-2 opacity-75">Completa el formulario para crear tu cuenta</p>
+            </div>
+            
+            <div class="card-body p-4">
+                <!-- Progress Steps -->
+                <div class="step-wizard mb-4">
+                    <div class="step-item active" data-step="1">
+                        <span class="step-number">1</span>
+                        <span class="step-label">Personal</span>
+                    </div>
+                    <div class="step-item" data-step="2">
+                        <span class="step-number">2</span>
+                        <span class="step-label">Académica</span>
+                    </div>
+                    <div class="step-item" data-step="3">
+                        <span class="step-number">3</span>
+                        <span class="step-label">Acceso</span>
+                    </div>
+                </div>
+
+                <form method="post" id="registroForm">
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger alert-dismissible fade show">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            {{ form.non_field_errors }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Paso 1: Información Personal -->
+                    <div class="form-section active" data-section="1">
+                        <h5 class="mb-4 text-primary">
+                            <i class="bi bi-person-badge"></i> Información Personal
+                        </h5>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.first_name.id_for_label }}" class="form-label">
+                                    <i class="bi bi-person"></i> Nombre *
+                                </label>
+                                <div class="input-icon">
+                                    <i class="bi bi-person"></i>
+                                    {{ form.first_name }}
+                                </div>
+                                {% if form.first_name.errors %}
+                                    <div class="text-danger small mt-1">{{ form.first_name.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.last_name.id_for_label }}" class="form-label">
+                                    <i class="bi bi-person"></i> Apellido *
+                                </label>
+                                <div class="input-icon">
+                                    <i class="bi bi-person"></i>
+                                    {{ form.last_name }}
+                                </div>
+                                {% if form.last_name.errors %}
+                                    <div class="text-danger small mt-1">{{ form.last_name.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.email.id_for_label }}" class="form-label">
+                                <i class="bi bi-envelope"></i> Correo Electrónico *
+                            </label>
+                            <div class="input-icon">
+                                <i class="bi bi-envelope"></i>
+                                {{ form.email }}
+                            </div>
+                            {% if form.email.errors %}
+                                <div class="text-danger small mt-1">{{ form.email.errors }}</div>
+                            {% endif %}
+                            <small class="text-muted">Utiliza tu correo institucional preferiblemente</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.telefono.id_for_label }}" class="form-label">
+                                <i class="bi bi-telephone"></i> Teléfono *
+                            </label>
+                            <div class="input-icon">
+                                <i class="bi bi-telephone"></i>
+                                {{ form.telefono }}
+                            </div>
+                            {% if form.telefono.errors %}
+                                <div class="text-danger small mt-1">{{ form.telefono.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Paso 2: Información Académica -->
+                    <div class="form-section" data-section="2">
+                        <h5 class="mb-4 text-success">
+                            <i class="bi bi-book"></i> Información Académica
+                        </h5>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.matricula.id_for_label }}" class="form-label">
+                                    <i class="bi bi-card-text"></i> Matrícula *
+                                </label>
+                                <div class="input-icon">
+                                    <i class="bi bi-card-text"></i>
+                                    {{ form.matricula }}
+                                </div>
+                                {% if form.matricula.errors %}
+                                    <div class="text-danger small mt-1">{{ form.matricula.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.codigo_estudiante.id_for_label }}" class="form-label">
+                                    <i class="bi bi-hash"></i> Código de Estudiante *
+                                </label>
+                                <div class="input-icon">
+                                    <i class="bi bi-hash"></i>
+                                    {{ form.codigo_estudiante }}
+                                </div>
+                                {% if form.codigo_estudiante.errors %}
+                                    <div class="text-danger small mt-1">{{ form.codigo_estudiante.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <label for="{{ form.carrera.id_for_label }}" class="form-label">
+                                    <i class="bi bi-mortarboard"></i> Carrera *
+                                </label>
+                                <div class="input-icon">
+                                    <i class="bi bi-mortarboard"></i>
+                                    {{ form.carrera }}
+                                </div>
+                                {% if form.carrera.errors %}
+                                    <div class="text-danger small mt-1">{{ form.carrera.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <label for="{{ form.semestre.id_for_label }}" class="form-label">
+                                    <i class="bi bi-calendar3"></i> Semestre *
+                                </label>
+                                {{ form.semestre }}
+                                {% if form.semestre.errors %}
+                                    <div class="text-danger small mt-1">{{ form.semestre.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i>
+                            <strong>Importante:</strong> Asegúrate de que toda la información académica sea correcta y coincida con tus documentos oficiales.
+                        </div>
+                    </div>
+                    
+                    <!-- Paso 3: Credenciales de Acceso -->
+                    <div class="form-section" data-section="3">
+                        <h5 class="mb-4 text-warning">
+                            <i class="bi bi-shield-lock"></i> Credenciales de Acceso
+                        </h5>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.username.id_for_label }}" class="form-label">
+                                <i class="bi bi-person-circle"></i> Nombre de Usuario *
+                            </label>
+                            <div class="input-icon">
+                                <i class="bi bi-person-circle"></i>
+                                {{ form.username }}
+                            </div>
+                            {% if form.username.errors %}
+                                <div class="text-danger small mt-1">{{ form.username.errors }}</div>
+                            {% endif %}
+                            <small class="text-muted">Este será tu usuario para iniciar sesión</small>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.password1.id_for_label }}" class="form-label">
+                                    <i class="bi bi-lock"></i> Contraseña *
+                                </label>
+                                <div class="input-icon">
+                                    <i class="bi bi-lock"></i>
+                                    {{ form.password1 }}
+                                </div>
+                                <div class="password-strength" id="passwordStrength"></div>
+                                <small class="text-muted" id="strengthText"></small>
+                                {% if form.password1.errors %}
+                                    <div class="text-danger small mt-1">{{ form.password1.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.password2.id_for_label }}" class="form-label">
+                                    <i class="bi bi-lock-fill"></i> Confirmar Contraseña *
+                                </label>
+                                <div class="input-icon">
+                                    <i class="bi bi-lock-fill"></i>
+                                    {{ form.password2 }}
+                                </div>
+                                <small class="text-muted" id="matchText"></small>
+                                {% if form.password2.errors %}
+                                    <div class="text-danger small mt-1">{{ form.password2.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <i class="bi bi-shield-exclamation"></i>
+                            <strong>Requisitos de la contraseña:</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>Mínimo 8 caracteres</li>
+                                <li>No puede ser completamente numérica</li>
+                                <li>No puede ser muy común</li>
+                                <li>No debe ser similar a tu información personal</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="acceptTerms" required>
+                            <label class="form-check-label" for="acceptTerms">
+                                Acepto los <a href="#" class="text-decoration-none">términos y condiciones</a> y la 
+                                <a href="#" class="text-decoration-none">política de privacidad</a>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Navigation Buttons -->
+                    <hr class="my-4">
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-secondary" id="prevBtn" style="display: none;">
+                            <i class="bi bi-arrow-left"></i> Anterior
+                        </button>
+                        <div></div>
+                        <button type="button" class="btn btn-primary" id="nextBtn">
+                            Siguiente <i class="bi bi-arrow-right"></i>
+                        </button>
+                        <button type="submit" class="btn btn-success btn-lg" id="submitBtn" style="display: none;">
+                            <i class="bi bi-check-circle"></i> Registrarse
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="text-center mt-4">
+                    <p class="mb-0">
+                        ¿Ya tienes cuenta? 
+                        <a href="{% url 'login' %}" class="text-decoration-none fw-bold">
+                            Inicia sesión aquí
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-3">
+            <a href="{% url 'home' %}" class="text-decoration-none">
+                <i class="bi bi-arrow-left"></i> Volver al inicio
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let currentStep = 1;
+    const totalSteps = 3;
+    
+    const nextBtn = document.getElementById('nextBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    // Navigation
+    nextBtn.addEventListener('click', () => {
+        if (validateStep(currentStep)) {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                updateForm();
+            }
+        }
+    });
+    
+    prevBtn.addEventListener('click', () => {
+        if (currentStep > 1) {
+            currentStep--;
+            updateForm();
+        }
+    });
+    
+    function updateForm() {
+        // Update sections
+        document.querySelectorAll('.form-section').forEach(section => {
+            section.classList.remove('active');
+        });
+        document.querySelector(`[data-section="${currentStep}"]`).classList.add('active');
+        
+        // Update steps indicator
+        document.querySelectorAll('.step-item').forEach((item, index) => {
+            item.classList.remove('active', 'completed');
+            if (index + 1 < currentStep) {
+                item.classList.add('completed');
+            } else if (index + 1 === currentStep) {
+                item.classList.add('active');
+            }
+        });
+        
+        // Update buttons
+        prevBtn.style.display = currentStep === 1 ? 'none' : 'block';
+        nextBtn.style.display = currentStep === totalSteps ? 'none' : 'block';
+        submitBtn.style.display = currentStep === totalSteps ? 'block' : 'none';
+    }
+    
+    function validateStep(step) {
+        let isValid = true;
+        const section = document.querySelector(`[data-section="${step}"]`);
+        const inputs = section.querySelectorAll('input[required], select[required]');
+        
+        inputs.forEach(input => {
+            if (!input.value.trim()) {
+                input.classList.add('is-invalid-custom');
+                isValid = false;
+            } else {
+                input.classList.remove('is-invalid-custom');
+                input.classList.add('is-valid-custom');
+            }
+        });
+        
+        return isValid;
+    }
+    
+    // Password strength checker
+    const password1 = document.getElementById('id_password1');
+    const password2 = document.getElementById('id_password2');
+    const strengthBar = document.getElementById('passwordStrength');
+    const strengthText = document.getElementById('strengthText');
+    const matchText = document.getElementById('matchText');
+    
+    password1.addEventListener('input', function() {
+        const value = this.value;
+        let strength = 0;
+        
+        if (value.length >= 8) strength++;
+        if (value.match(/[a-z]+/)) strength++;
+        if (value.match(/[A-Z]+/)) strength++;
+        if (value.match(/[0-9]+/)) strength++;
+        if (value.match(/[$@#&!]+/)) strength++;
+        
+        strengthBar.className = 'password-strength';
+        
+        if (strength < 3) {
+            strengthBar.classList.add('weak');
+            strengthText.textContent = 'Débil';
+            strengthText.className = 'text-danger';
+        } else if (strength < 5) {
+            strengthBar.classList.add('medium');
+            strengthText.textContent = 'Media';
+            strengthText.className = 'text-warning';
+        } else {
+            strengthBar.classList.add('strong');
+            strengthText.textContent = 'Fuerte';
+            strengthText.className = 'text-success';
+        }
+        
+        checkPasswordMatch();
+    });
+    
+    password2.addEventListener('input', checkPasswordMatch);
+    
+    function checkPasswordMatch() {
+        if (password2.value) {
+            if (password1.value === password2.value) {
+                matchText.textContent = '✓ Las contraseñas coinciden';
+                matchText.className = 'text-success';
+                password2.classList.remove('is-invalid-custom');
+                password2.classList.add('is-valid-custom');
+            } else {
+                matchText.textContent = '✗ Las contraseñas no coinciden';
+                matchText.className = 'text-danger';
+                password2.classList.remove('is-valid-custom');
+                password2.classList.add('is-invalid-custom');
+            }
+        }
+    }
+    
+    // Real-time validation
+    document.querySelectorAll('input[required]').forEach(input => {
+        input.addEventListener('blur', function() {
+            if (this.value.trim()) {
+                this.classList.remove('is-invalid-custom');
+                this.classList.add('is-valid-custom');
+            }
+        });
+    });
+</script>
+{% endblock %}
