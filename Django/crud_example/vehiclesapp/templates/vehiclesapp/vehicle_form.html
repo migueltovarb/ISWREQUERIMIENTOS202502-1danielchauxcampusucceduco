@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Añadir Nuevo Vehículo</title>
+</head>
+<body>
+    <h1>➕ Añadir Nuevo Vehículo</h1>
+    
+    <form method="POST">
+        {% csrf_token %} {{ form.as_p }} 
+        
+        <button type="submit">Guardar Vehículo</button>
+    </form>
+    
+    <hr>
+    <a href="{% url 'vehicle_list' %}">Volver a la lista</a>
+</body>
+</html>
